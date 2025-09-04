@@ -22,10 +22,11 @@ import java.util.UUID;
 public class CostumerController {
 
     private final CostumerService costumerService;
-    private static final CostumerMapper costumerMapper = CostumerMapper.INSTANCE;
+    private final CostumerMapper costumerMapper;
 
-    public CostumerController(CostumerService costumerService) {
+    public CostumerController(CostumerService costumerService, CostumerMapper costumerMapper) {
         this.costumerService = costumerService;
+        this.costumerMapper = costumerMapper;
     }
 
     @PostMapping

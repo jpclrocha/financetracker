@@ -18,10 +18,11 @@ import java.util.UUID;
 public class TransactionController {
 
     private final TransactionService transactionService;
-    private static final TransactionMapper transactionMapper = TransactionMapper.INSTANCE;
+    private final TransactionMapper transactionMapper;
 
-    public TransactionController(TransactionService transactionService) {
+    public TransactionController(TransactionService transactionService, TransactionMapper transactionMapper) {
         this.transactionService = transactionService;
+        this.transactionMapper = transactionMapper;
     }
 
     @PostMapping

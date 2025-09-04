@@ -22,15 +22,16 @@ import java.util.UUID;
 @Service
 public class CostumerService {
 
-    private static final CostumerMapper costumerMapper = CostumerMapper.INSTANCE;
+    private final CostumerMapper costumerMapper;
     private final CostumerRepository repository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public CostumerService(CostumerRepository repository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
+    public CostumerService(CostumerRepository repository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder, CostumerMapper costumerMapper) {
         this.repository = repository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.costumerMapper = costumerMapper;
     }
 
     public List<Costumer> findAll() {

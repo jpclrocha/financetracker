@@ -20,11 +20,12 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CostumerService costumerService;
-    private static final CategoryMapper categoryMapper = CategoryMapper.INSTANCE;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryService(CategoryRepository categoryRepository, CostumerService costumerService) {
+    public CategoryService(CategoryRepository categoryRepository, CostumerService costumerService, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
         this.costumerService = costumerService;
+        this.categoryMapper = categoryMapper;
     }
 
     public Category createCategory(CategoryRequestDTO categoryRequestDTO) {

@@ -15,10 +15,11 @@ import java.util.List;
 public class BudgetController {
 
     private final BudgetService budgetService;
-    private static final BudgetMapper budgetMapper = BudgetMapper.INSTANCE;
+    private final BudgetMapper budgetMapper;
 
-    public BudgetController(BudgetService budgetService) {
+    public BudgetController(BudgetService budgetService, BudgetMapper budgetMapper) {
         this.budgetService = budgetService;
+        this.budgetMapper = budgetMapper;
     }
 
     @PostMapping

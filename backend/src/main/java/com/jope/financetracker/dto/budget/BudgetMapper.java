@@ -5,10 +5,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface BudgetMapper {
-
-    BudgetMapper INSTANCE = Mappers.getMapper(BudgetMapper.class);
 
     BudgetResponseDTO budgetToBudgetResponseDTO(Budget budget);
 

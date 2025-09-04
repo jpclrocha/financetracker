@@ -17,12 +17,13 @@ public class BudgetService {
 
     private final BudgetRepository budgetRepository;
     private final CostumerService costumerService;
-    private static final BudgetMapper budgetMapper = BudgetMapper.INSTANCE;
+    private final BudgetMapper budgetMapper;
     private final CurrentUserService currentUserService;
 
-    public BudgetService(BudgetRepository budgetRepository, CostumerService costumerService, CurrentUserService currentUserService) {
+    public BudgetService(BudgetRepository budgetRepository, CostumerService costumerService, BudgetMapper budgetMapper, CurrentUserService currentUserService) {
         this.budgetRepository = budgetRepository;
         this.costumerService = costumerService;
+        this.budgetMapper = budgetMapper;
         this.currentUserService = currentUserService;
     }
 

@@ -14,10 +14,11 @@ import java.util.List;
 public class RecurringTransactionController {
 
     private final RecurringTransactionService recurringTransactionService;
-    private static final RecurringTransactionMapper recurringTransactionMapper = RecurringTransactionMapper.INSTANCE;
+    private final RecurringTransactionMapper recurringTransactionMapper;
 
-    public RecurringTransactionController(RecurringTransactionService recurringTransactionService) {
+    public RecurringTransactionController(RecurringTransactionService recurringTransactionService, RecurringTransactionMapper recurringTransactionMapper) {
         this.recurringTransactionService = recurringTransactionService;
+        this.recurringTransactionMapper = recurringTransactionMapper;
     }
 
     @PostMapping

@@ -5,10 +5,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface TransactionMapper {
-
-    TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
 
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(target = "isInstallment", expression = "java(transaction.getInstallmentGroupId() != null)")
