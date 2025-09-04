@@ -35,9 +35,8 @@ public class CostumerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CostumerResponseDTO> getCostumerById(@PathVariable UUID id, JwtAuthenticationToken token) {
-        Costumer cos = costumerService.findById(id);
-        if(cos.getId().equals(UUID.fromString(token.getName()))){
-            return ResponseEntity.ok(costumerMapper.costumerToCostumerResponseDTO(cos));
+        if(id.equals(UUID.fromString(token.getName()))){
+            return ResponseEntity.ok(costumerMapper.costumerToCostumerResponseDTO(costumerService.findById(id)));
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
@@ -49,8 +48,11 @@ public class CostumerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CostumerResponseDTO> updateCostumer(@PathVariable UUID id, @RequestBody CostumerRequestDTO costumerRequestDTO) {
-        return ResponseEntity.ok(costumerMapper.costumerToCostumerResponseDTO(costumerService.updateCostumer(id, costumerRequestDTO)));
+    public ResponseEntity<CostumerResponseDTO> updateCostumer(@PathVariable UUID id, @RequestBody CostumerRequestDTO costumerRequestDTO, JwtAuthenticationToken token) {
+        if(id.equals(UUID.fromString(token.getName()))){
+            return ResponseEntity.ok(costumerMapper.costumerToCostumerResponseDTO(costumerService.updateCostumer(id, costumerRequestDTO)));
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     

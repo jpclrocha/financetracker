@@ -18,5 +18,6 @@ public interface CostumerMapper {
     @Mapping(target = "recurringTransactions", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "budgets", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     Costumer costumerRequestDTOToCostumer(CostumerRequestDTO costumerRequestDTO);
 }

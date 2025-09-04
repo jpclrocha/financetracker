@@ -5,6 +5,7 @@ import com.jope.financetracker.dto.budget.BudgetRequestDTO;
 import com.jope.financetracker.dto.budget.BudgetResponseDTO;
 import com.jope.financetracker.service.BudgetService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,8 @@ public class BudgetController {
 
     @PostMapping
     public ResponseEntity<BudgetResponseDTO> createBudget(@RequestBody BudgetRequestDTO budget) {
-        return ResponseEntity.status(201).body(budgetMapper.budgetToBudgetResponseDTO(budgetService.createBudget(budget)));
+        return ResponseEntity.status(201).body(budgetMapper
+                .budgetToBudgetResponseDTO(budgetService.createBudget(budget)));
     }
 
     @GetMapping("/{id}")
@@ -31,13 +33,17 @@ public class BudgetController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<List<BudgetResponseDTO>> getAllBudgets() {
-        return ResponseEntity.ok(budgetService.getAllBudgets().stream().map(budgetMapper::budgetToBudgetResponseDTO).toList());
+        return ResponseEntity
+                .ok(budgetService.getAllBudgets().stream().map(budgetMapper::budgetToBudgetResponseDTO).toList());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BudgetResponseDTO> updateBudget(@PathVariable Long id, @RequestBody BudgetRequestDTO budgetDetails) {
-        return ResponseEntity.ok(budgetMapper.budgetToBudgetResponseDTO(budgetService.updateBudget(id, budgetDetails)));
+    public ResponseEntity<BudgetResponseDTO> updateBudget(@PathVariable Long id,
+            @RequestBody BudgetRequestDTO budgetDetails) {
+        return ResponseEntity.ok(budgetMapper.budgetToBudgetResponseDTO(
+                budgetService.updateBudget(id, budgetDetails)));
     }
 
     @DeleteMapping("/{id}")
