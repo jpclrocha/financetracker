@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.jope.financetracker.config.uuid_v7.GeneratedUuidV7;
+import com.jope.financetracker.enums.Currency;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,7 +28,7 @@ public class Costumer {
     private String email;
 
     @Column(nullable = false)
-    private String currency;
+    private Currency currency;
 
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();

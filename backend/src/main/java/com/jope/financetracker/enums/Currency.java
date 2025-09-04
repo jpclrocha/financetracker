@@ -1,5 +1,6 @@
 package com.jope.financetracker.enums;
 
+
 public enum Currency {
     USD("USD"),
     BRL("BRL"),
