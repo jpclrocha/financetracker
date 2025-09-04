@@ -3,9 +3,8 @@ package com.jope.financetracker.dto.recurringtransaction;
 import com.jope.financetracker.model.RecurringTransaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface RecurringTransactionMapper {
 
     @Mapping(source = "category.name", target = "categoryName")

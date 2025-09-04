@@ -3,9 +3,8 @@ package com.jope.financetracker.dto.costumer;
 import com.jope.financetracker.model.Costumer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface CostumerMapper {
 
     CostumerResponseDTO costumerToCostumerResponseDTO(Costumer costumer);
@@ -17,5 +16,6 @@ public interface CostumerMapper {
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "budgets", ignore = true)
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "currency", expression = "java(com.jope.financetracker.enums.Currency.valueOf(costumerRequestDTO.currency()))")
     Costumer costumerRequestDTOToCostumer(CostumerRequestDTO costumerRequestDTO);
 }

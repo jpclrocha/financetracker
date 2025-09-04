@@ -2,12 +2,15 @@ package com.jope.financetracker.service;
 
 import com.jope.financetracker.dto.budget.BudgetMapper;
 import com.jope.financetracker.dto.budget.BudgetRequestDTO;
+import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
 import com.jope.financetracker.model.Budget;
 import com.jope.financetracker.model.Costumer;
 import com.jope.financetracker.repository.BudgetRepository;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +23,8 @@ public class BudgetService {
     private final BudgetMapper budgetMapper;
     private final CurrentUserService currentUserService;
 
-    public BudgetService(BudgetRepository budgetRepository, CostumerService costumerService, BudgetMapper budgetMapper, CurrentUserService currentUserService) {
+    public BudgetService(BudgetRepository budgetRepository, CostumerService costumerService, BudgetMapper budgetMapper,
+            CurrentUserService currentUserService) {
         this.budgetRepository = budgetRepository;
         this.costumerService = costumerService;
         this.budgetMapper = budgetMapper;
@@ -36,20 +40,26 @@ public class BudgetService {
 
     public Budget getBudgetById(Long id) {
         Budget buget = budgetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-        if(buget.getCostumer().getId().equals(currentUserService.getCurrentUserId())){
+        if (buget.getCostumer().getId().equals(currentUserService.getCurrentUserId())) {
             return buget;
         }
         throw new AccessDeniedException("This budget does not exist, or you do not have the necessary access rights!");
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<Budget> getAllBudgets() {
-        currentUserService.hasRole();
         return budgetRepository.findAll();
     }
 
     public Budget updateBudget(Long id, BudgetRequestDTO budgetRequestDTO) {
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
+
+        if (!budget.getCostumer().getId().equals(currentUserService.getCurrentUserId())) {
+            throw new AccessDeniedException(
+                    "This budget does not exist, or you do not have the necessary access rights!");
+        }
+
         Costumer costumer = costumerService.findById(currentUserService.getCurrentUserId());
 
         budget.setCostumer(costumer);
@@ -62,6 +72,14 @@ public class BudgetService {
     }
 
     public void deleteBudget(Long id) {
-        budgetRepository.deleteById(id);
+        Budget b = budgetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Budget not found!"));
+        if (!b.getCostumer().getId().equals(currentUserService.getCurrentUserId())) {
+            throw new AccessDeniedException("This budget does not exist, or you do not have the necessary access rights!");
+        }
+        try {
+            budgetRepository.deleteById(id);
+        } catch (DataAccessException ex) {
+            throw new DatabaseException("Failed to delete budget: " + id);
+        }
     }
 }

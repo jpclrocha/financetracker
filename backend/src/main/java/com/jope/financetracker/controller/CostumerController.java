@@ -3,7 +3,6 @@ package com.jope.financetracker.controller;
 import com.jope.financetracker.dto.costumer.CostumerMapper;
 import com.jope.financetracker.dto.costumer.CostumerRequestDTO;
 import com.jope.financetracker.dto.costumer.CostumerResponseDTO;
-import com.jope.financetracker.model.Costumer;
 import com.jope.financetracker.service.CostumerService;
 
 import jakarta.validation.Valid;

@@ -3,9 +3,8 @@ package com.jope.financetracker.dto.category;
 import com.jope.financetracker.model.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface CategoryMapper {
 
     CategoryResponseDTO categoryToCategoryResponseDTO(Category category);
@@ -15,5 +14,6 @@ public interface CategoryMapper {
     @Mapping(target = "isPublic", ignore = true)
     @Mapping(target = "transactions", ignore = true)
     @Mapping(target = "recurringTransactions", ignore = true)
+    @Mapping(target = "type", expression = "java(com.jope.financetracker.enums.ExpenseType.valueOf(categoryRequestDTO.type()))")
     Category categoryRequestDTOToCategory(CategoryRequestDTO categoryRequestDTO);
 }

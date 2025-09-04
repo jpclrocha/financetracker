@@ -5,7 +5,6 @@ import com.jope.financetracker.dto.transaction.InstallmentsTransactionResponseDT
 import com.jope.financetracker.dto.transaction.TransactionMapper;
 import com.jope.financetracker.dto.transaction.TransactionRequestDTO;
 import com.jope.financetracker.dto.transaction.TransactionResponseDTO;
-import com.jope.financetracker.model.Transaction;
 import com.jope.financetracker.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
