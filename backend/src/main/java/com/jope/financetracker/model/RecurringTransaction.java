@@ -17,7 +17,7 @@ import lombok.Data;
 @Entity
 @Data
 public class RecurringTransaction {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne

@@ -13,5 +13,6 @@ public interface BudgetMapper {
     BudgetResponseDTO budgetToBudgetResponseDTO(Budget budget);
 
     @Mapping(source = "costumerId", target = "costumer.id")
+    @Mapping(target = "id", ignore = true)
     Budget budgetRequestDTOToBudget(BudgetRequestDTO budgetRequestDTO);
 }

@@ -15,7 +15,7 @@ import lombok.Data;
 @Entity
 @Data
 public class Budget {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne

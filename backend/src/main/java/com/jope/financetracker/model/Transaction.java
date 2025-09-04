@@ -2,7 +2,9 @@ package com.jope.financetracker.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,7 +16,7 @@ import lombok.Data;
 @Entity
 @Data
 public class Transaction {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
@@ -30,4 +32,14 @@ public class Transaction {
     private LocalDate date;
 
     private String description;
+
+    // ----- INSTALLMENTS -----
+    @Column(nullable = true)
+    private UUID installmentGroupId;
+    
+    @Column(nullable = true)
+    private Integer installmentNumber;
+    
+    @Column(nullable = true)
+    private Integer installmentTotal;
 }

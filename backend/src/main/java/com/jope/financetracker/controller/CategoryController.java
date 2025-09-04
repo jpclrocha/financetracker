@@ -27,7 +27,7 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long id) {
-        return ResponseEntity.ok(categoryMapper.categoryToCategoryResponseDTO(categoryService.getCategoryById(id)));
+        return ResponseEntity.ok(categoryMapper.categoryToCategoryResponseDTO(categoryService.findCategoryById(id, null)));
     }
 
     @GetMapping

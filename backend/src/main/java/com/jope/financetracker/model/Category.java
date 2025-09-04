@@ -19,18 +19,23 @@ import lombok.Data;
 @Entity
 @Data
 public class Category {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "costumer_id", nullable = false)
+    @JoinColumn(name = "costumer_id")
+    // null if the category is public
     private Costumer costumer;
+
+    @Column(name = "is_public", nullable = false, updatable = false)
+    private Boolean isPublic = false;
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "type")
     private ExpenseType type;
+
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();

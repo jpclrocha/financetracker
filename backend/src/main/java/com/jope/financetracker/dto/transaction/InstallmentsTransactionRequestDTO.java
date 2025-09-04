@@ -2,12 +2,13 @@ package com.jope.financetracker.dto.transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
-public record TransactionResponseDTO(
-    Long id,
-    String categoryName,
+public record InstallmentsTransactionRequestDTO(
+    UUID costumerId,
+    Long categoryId,
     BigDecimal amount,
     LocalDate date,
     String description,
-    Boolean isInstallment
+    Integer installmentTotal
 ) {}

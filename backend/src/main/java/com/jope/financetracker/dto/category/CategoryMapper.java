@@ -13,5 +13,9 @@ public interface CategoryMapper {
     CategoryResponseDTO categoryToCategoryResponseDTO(Category category);
 
     @Mapping(source = "costumerId", target = "costumer.id")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "isPublic", ignore = true)
+    @Mapping(target = "transactions", ignore = true)
+    @Mapping(target = "recurringTransactions", ignore = true)
     Category categoryRequestDTOToCategory(CategoryRequestDTO categoryRequestDTO);
 }
