@@ -5,7 +5,6 @@ import com.jope.financetracker.dto.category.CategoryRequestDTO;
 import com.jope.financetracker.enums.ExpenseType;
 import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
-import com.jope.financetracker.model.Budget;
 import com.jope.financetracker.model.Category;
 import com.jope.financetracker.model.Costumer;
 import com.jope.financetracker.repository.CategoryRepository;
