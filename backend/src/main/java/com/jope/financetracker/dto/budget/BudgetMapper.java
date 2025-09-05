@@ -4,7 +4,7 @@ import com.jope.financetracker.model.Budget;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface BudgetMapper {
 
     BudgetResponseDTO budgetToBudgetResponseDTO(Budget budget);

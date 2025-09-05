@@ -4,7 +4,7 @@ import com.jope.financetracker.model.RecurringTransaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface RecurringTransactionMapper {
 
     @Mapping(source = "category.name", target = "categoryName")

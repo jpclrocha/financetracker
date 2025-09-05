@@ -10,7 +10,6 @@ import com.jope.financetracker.repository.BudgetRepository;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -46,9 +45,8 @@ public class BudgetService {
         throw new AccessDeniedException("This budget does not exist, or you do not have the necessary access rights!");
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<Budget> getAllBudgets() {
-        return budgetRepository.findAll();
+        return budgetRepository.findAllByCostumerId(currentUserService.getCurrentUserId());
     }
 
     public Budget updateBudget(Long id, BudgetRequestDTO budgetRequestDTO) {
@@ -74,7 +72,8 @@ public class BudgetService {
     public void deleteBudget(Long id) {
         Budget b = budgetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Budget not found!"));
         if (!b.getCostumer().getId().equals(currentUserService.getCurrentUserId())) {
-            throw new AccessDeniedException("This budget does not exist, or you do not have the necessary access rights!");
+            throw new AccessDeniedException(
+                    "This budget does not exist, or you do not have the necessary access rights!");
         }
         try {
             budgetRepository.deleteById(id);

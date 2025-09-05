@@ -4,7 +4,7 @@ import com.jope.financetracker.model.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface TransactionMapper {
 
     @Mapping(source = "category.name", target = "categoryName")

@@ -4,7 +4,7 @@ import com.jope.financetracker.model.Costumer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CostumerMapper {
 
     CostumerResponseDTO costumerToCostumerResponseDTO(Costumer costumer);
