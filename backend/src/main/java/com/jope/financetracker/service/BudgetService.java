@@ -38,10 +38,8 @@ public class BudgetService {
     }
 
     public Budget getBudgetById(Long id) {
-        Budget buget = budgetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-        if (buget.getCostumer().getId().equals(currentUserService.getCurrentUserId())) {
-            return buget;
-        }
+        Budget budget = budgetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        currentUserService.checkAccess(budget.getCostumer().getId());
         throw new AccessDeniedException("This budget does not exist, or you do not have the necessary access rights!");
     }
 
@@ -53,10 +51,7 @@ public class BudgetService {
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
 
-        if (!budget.getCostumer().getId().equals(currentUserService.getCurrentUserId())) {
-            throw new AccessDeniedException(
-                    "This budget does not exist, or you do not have the necessary access rights!");
-        }
+        currentUserService.checkAccess(budget.getCostumer().getId());
 
         Costumer costumer = costumerService.findById(currentUserService.getCurrentUserId());
 
@@ -71,10 +66,7 @@ public class BudgetService {
 
     public void deleteBudget(Long id) {
         Budget b = budgetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Budget not found!"));
-        if (!b.getCostumer().getId().equals(currentUserService.getCurrentUserId())) {
-            throw new AccessDeniedException(
-                    "This budget does not exist, or you do not have the necessary access rights!");
-        }
+        currentUserService.checkAccess(b.getCostumer().getId());
         try {
             budgetRepository.deleteById(id);
         } catch (DataAccessException ex) {

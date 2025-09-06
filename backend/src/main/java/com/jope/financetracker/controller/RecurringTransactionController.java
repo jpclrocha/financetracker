@@ -4,6 +4,7 @@ import com.jope.financetracker.dto.recurringtransaction.RecurringTransactionMapp
 import com.jope.financetracker.dto.recurringtransaction.RecurringTransactionRequestDTO;
 import com.jope.financetracker.dto.recurringtransaction.RecurringTransactionResponseDTO;
 import com.jope.financetracker.service.RecurringTransactionService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,8 @@ public class RecurringTransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<RecurringTransactionResponseDTO> createRecurringTransaction(@RequestBody RecurringTransactionRequestDTO recurringTransactionRequestDTO) {
-        return ResponseEntity.status(201).body(recurringTransactionMapper.recurringTransactionToRecurringTransactionResponseDTO(recurringTransactionService.createRecurringTransaction(recurringTransactionMapper.recurringTransactionRequestDTOToRecurringTransaction(recurringTransactionRequestDTO))));
+    public ResponseEntity<RecurringTransactionResponseDTO> createRecurringTransaction(@RequestBody @Valid RecurringTransactionRequestDTO recurringTransactionRequestDTO) {
+        return ResponseEntity.status(201).body(recurringTransactionMapper.recurringTransactionToRecurringTransactionResponseDTO(recurringTransactionService.createRecurringTransaction(recurringTransactionRequestDTO)));
     }
 
     @GetMapping("/{id}")

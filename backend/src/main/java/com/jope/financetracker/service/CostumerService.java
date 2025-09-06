@@ -3,13 +3,18 @@ package com.jope.financetracker.service;
 import com.jope.financetracker.dto.costumer.CostumerMapper;
 import com.jope.financetracker.dto.costumer.CostumerRequestDTO;
 import com.jope.financetracker.enums.Currency;
+import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
+import com.jope.financetracker.model.Budget;
 import com.jope.financetracker.model.Costumer;
 import com.jope.financetracker.model.Role;
 import com.jope.financetracker.repository.CostumerRepository;
 import com.jope.financetracker.repository.RoleRepository;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,23 +29,27 @@ public class CostumerService {
 
     private final CostumerMapper costumerMapper;
     private final CostumerRepository repository;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final CurrentUserService currentUserService;
 
-    public CostumerService(CostumerRepository repository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder, CostumerMapper costumerMapper) {
+    public CostumerService(CostumerRepository repository, RoleService roleService, BCryptPasswordEncoder passwordEncoder, CostumerMapper costumerMapper, CurrentUserService currentUserService) {
         this.repository = repository;
-        this.roleRepository = roleRepository;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.costumerMapper = costumerMapper;
+        this.currentUserService = currentUserService;
     }
 
+    @PreAuthorize("@currentUserService.isAdmin()")
     public List<Costumer> findAll() {
         return repository.findAll();
     }
 
     public Costumer findById(UUID id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
+        Costumer cos = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        currentUserService.checkAccess(cos.getId());
+        return cos;
     }
 
     public Optional<Costumer> findByEmail(String email){
@@ -48,8 +57,8 @@ public class CostumerService {
     }
 
     public Costumer createCostumer(CostumerRequestDTO costumerRequestDTO) {
-        Role r = roleRepository.findByName(Role.Values.BASIC.name());
-        Optional<Costumer> opt = repository.findByEmail(costumerRequestDTO.email());
+        Role r = roleService.findByName(Role.Values.BASIC.name());
+        Optional<Costumer> opt = this.findByEmail(costumerRequestDTO.email());
 
         if(opt.isPresent()){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
@@ -62,8 +71,9 @@ public class CostumerService {
     }
 
     public Costumer updateCostumer(UUID id, CostumerRequestDTO costumerRequestDTO) {
-        Costumer costumer = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
+        currentUserService.checkAccess(id);
+
+        Costumer costumer = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
         costumer.setName(costumerRequestDTO.name());
         costumer.setEmail(costumerRequestDTO.email());
@@ -73,6 +83,11 @@ public class CostumerService {
     }
 
     public void deleteCostumer(UUID id) {
-        repository.deleteById(id);
+        currentUserService.checkAccess(id);
+        try {
+            repository.deleteById(id);
+        } catch (DataAccessException ex) {
+            throw new DatabaseException("Failed to delete costumer: " + id);
+        }
     }
 }

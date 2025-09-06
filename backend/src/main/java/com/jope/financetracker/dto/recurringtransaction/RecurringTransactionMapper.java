@@ -11,7 +11,7 @@ public interface RecurringTransactionMapper {
     RecurringTransactionResponseDTO recurringTransactionToRecurringTransactionResponseDTO(RecurringTransaction recurringTransaction);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(source = "costumerId", target = "costumer.id")
+    @Mapping(target = "costumer", ignore = true)
     @Mapping(source = "categoryId", target = "category.id")
     RecurringTransaction recurringTransactionRequestDTOToRecurringTransaction(RecurringTransactionRequestDTO recurringTransactionRequestDTO);
 }

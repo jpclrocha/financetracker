@@ -45,11 +45,11 @@ public class TokenController {
         var scopes = opt.get().getRoles().stream().map(Role::getName).collect(Collectors.joining(" "));
 
         Instant now = Instant.now();
-        Long expiresIn = 300L;
+        long expiresIn = 300L;
 
         var claims = JwtClaimsSet
             .builder()
-            .issuer("jkoikok")
+            .issuer("financetracker_backend")
             .subject(opt.get().getId().toString())
             .issuedAt(now)
             .expiresAt(now.plusSeconds(expiresIn))

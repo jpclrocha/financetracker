@@ -42,7 +42,7 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("@currentUserService.isAdmin()")
     public Category createPublicCategory(CategoryRequestDTO categoryRequestDTO) {
         Category category = categoryMapper.categoryRequestDTOToCategory(categoryRequestDTO);
         category.setCostumer(null);
@@ -69,9 +69,7 @@ public class CategoryService {
     public Category updateCategory(Long id, CategoryRequestDTO categoryRequestDTO) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        if(!category.getCostumer().getId().equals(currentUserService.getCurrentUserId())){
-            throw new AccessDeniedException("The category does not exist, or the user does not have the necessary access rights!");
-        }
+        currentUserService.checkAccess(category.getCostumer().getId());
 
         category.setName(categoryRequestDTO.name());
         category.setType(ExpenseType.valueOf(categoryRequestDTO.type()));
@@ -81,9 +79,7 @@ public class CategoryService {
 
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-        if(!category.getCostumer().getId().equals(currentUserService.getCurrentUserId())){
-            throw new AccessDeniedException("The category does not exist, or the user does not have the necessary access rights!");
-        }
+        currentUserService.checkAccess(category.getCostumer().getId());
         try {
             categoryRepository.deleteById(id);
         } catch (DataAccessException e) {
