@@ -30,6 +30,30 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 return new ResponseEntity<>(error, status);
         }
 
+        @ExceptionHandler(DatabaseException.class)
+        protected ResponseEntity<ApiErrorDTO> handleDatabaseException(DatabaseException e, WebRequest request) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+            ApiErrorDTO error = new ApiErrorDTO(
+                    status,
+                    e.getMessage(),
+                    path,
+                    Instant.now());
+            return new ResponseEntity<>(error, status);
+        }
+
+        @ExceptionHandler(InvalidTokenException.class)
+        protected ResponseEntity<ApiErrorDTO> handleInvalidTokenException(InvalidTokenException e, WebRequest request) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+            ApiErrorDTO error = new ApiErrorDTO(
+                    status,
+                    e.getMessage(),
+                    path,
+                    Instant.now());
+            return new ResponseEntity<>(error, status);
+        }
+
         @ExceptionHandler(AccessDeniedException.class)
         protected ResponseEntity<ApiErrorDTO> handleAccessDeniedException(AccessDeniedException e,
                         WebRequest request) {

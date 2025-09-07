@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/costumers")
+@RequestMapping("/costumers")
 public class CostumerController {
 
     private final CostumerService costumerService;

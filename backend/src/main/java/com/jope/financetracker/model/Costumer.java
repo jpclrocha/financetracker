@@ -1,7 +1,7 @@
 package com.jope.financetracker.model;
 
 import com.jope.financetracker.config.uuid_v7.GeneratedUuidV7;
-import com.jope.financetracker.dto.login.LoginRequestDTO;
+import com.jope.financetracker.dto.auth.AuthRequestDTO;
 import com.jope.financetracker.enums.Currency;
 import jakarta.persistence.*;
 import lombok.*;
@@ -61,7 +61,7 @@ public class Costumer {
     @ToString.Exclude
     private Set<Budget> budgets = new HashSet<>();
 
-    public boolean isLoginCorrect(LoginRequestDTO loginRequest, PasswordEncoder passwordEncoder){
+    public boolean isLoginCorrect(AuthRequestDTO loginRequest, PasswordEncoder passwordEncoder){
         return passwordEncoder.matches(loginRequest.password(), this.password);
     }
 

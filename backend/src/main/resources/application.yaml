@@ -15,8 +15,12 @@ spring:
 
 server:
     port: 7777
+    servlet:
+      context-path: /api/v1
 
 jwt:
+    access-token-expiration: 600000
+    refresh-token-expiration: 3600000
     public:
         key: classpath:app.pub
     private:
