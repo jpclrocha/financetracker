@@ -1,29 +1,24 @@
 package com.jope.financetracker.model;
 
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.jope.financetracker.config.uuid_v7.GeneratedUuidV7;
 import com.jope.financetracker.dto.login.LoginRequestDTO;
 import com.jope.financetracker.enums.Currency;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import lombok.Data;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 public class Costumer {
     @Id
     @GeneratedUuidV7
@@ -39,7 +34,7 @@ public class Costumer {
     private String email;
     private String password;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
         name = "costumer_roles", 
         joinColumns = @JoinColumn(name = "costumer_id"),
@@ -51,18 +46,38 @@ public class Costumer {
     private Instant createdAt = Instant.now();
 
     @OneToMany(mappedBy = "costumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<Transaction> transactions = new HashSet<>();
 
     @OneToMany(mappedBy = "costumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<RecurringTransaction> recurringTransactions = new HashSet<>();
 
     @OneToMany(mappedBy = "costumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<Category> categories = new HashSet<>();
 
     @OneToMany(mappedBy = "costumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<Budget> budgets = new HashSet<>();
 
     public boolean isLoginCorrect(LoginRequestDTO loginRequest, PasswordEncoder passwordEncoder){
         return passwordEncoder.matches(loginRequest.password(), this.password);
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Costumer costumer = (Costumer) o;
+        return getId() != null && Objects.equals(getId(), costumer.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }
