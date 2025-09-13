@@ -5,15 +5,12 @@ import com.jope.financetracker.dto.costumer.CostumerRequestDTO;
 import com.jope.financetracker.enums.Currency;
 import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
-import com.jope.financetracker.model.Budget;
-import com.jope.financetracker.model.Costumer;
+import com.jope.financetracker.model.Customer;
 import com.jope.financetracker.model.Role;
 import com.jope.financetracker.repository.CostumerRepository;
-import com.jope.financetracker.repository.RoleRepository;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,44 +39,44 @@ public class CostumerService {
     }
 
     @PreAuthorize("@currentUserService.isAdmin()")
-    public List<Costumer> findAll() {
+    public List<Customer> findAll() {
         return repository.findAll();
     }
 
-    public Costumer findById(UUID id) {
-        Costumer cos = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+    public Customer findById(UUID id) {
+        Customer cos = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         currentUserService.checkAccess(cos.getId());
         return cos;
     }
 
-    public Optional<Costumer> findByEmail(String email){
+    public Optional<Customer> findByEmail(String email){
         return repository.findByEmail(email);
     }
 
-    public Costumer createCostumer(CostumerRequestDTO costumerRequestDTO) {
+    public Customer createCostumer(CostumerRequestDTO costumerRequestDTO) {
         Role r = roleService.findByName(Role.Values.BASIC.name());
-        Optional<Costumer> opt = this.findByEmail(costumerRequestDTO.email());
+        Optional<Customer> opt = this.findByEmail(costumerRequestDTO.email());
 
         if(opt.isPresent()){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        Costumer costumer = costumerMapper.costumerRequestDTOToCostumer(costumerRequestDTO);
-        costumer.setPassword(passwordEncoder.encode(costumerRequestDTO.password()));
-        costumer.setRoles(Set.of(r));
-        return repository.save(costumer);
+        Customer customer = costumerMapper.costumerRequestDTOToCostumer(costumerRequestDTO);
+        customer.setPassword(passwordEncoder.encode(costumerRequestDTO.password()));
+        customer.setRoles(Set.of(r));
+        return repository.save(customer);
     }
 
-    public Costumer updateCostumer(UUID id, CostumerRequestDTO costumerRequestDTO) {
+    public Customer updateCostumer(UUID id, CostumerRequestDTO costumerRequestDTO) {
         currentUserService.checkAccess(id);
 
-        Costumer costumer = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        Customer customer = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        costumer.setName(costumerRequestDTO.name());
-        costumer.setEmail(costumerRequestDTO.email());
-        costumer.setCurrency(Currency.valueOf(costumerRequestDTO.currency()));
+        customer.setName(costumerRequestDTO.name());
+        customer.setEmail(costumerRequestDTO.email());
+        customer.setCurrency(Currency.valueOf(costumerRequestDTO.currency()));
 
-        return repository.save(costumer);
+        return repository.save(customer);
     }
 
     public void deleteCostumer(UUID id) {
