@@ -19,7 +19,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Costumer {
+public class Customer {
     @Id
     @GeneratedUuidV7
     private UUID id;
@@ -28,6 +28,7 @@ public class Costumer {
     private String name;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Currency currency;
 
     @Column(unique = true, nullable = false)
@@ -36,8 +37,8 @@ public class Costumer {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
-        name = "costumer_roles", 
-        joinColumns = @JoinColumn(name = "costumer_id"),
+        name = "customer_roles",
+        joinColumns = @JoinColumn(name = "customer_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
         )
     private Set<Role> roles;
@@ -45,24 +46,31 @@ public class Costumer {
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();
 
-    @OneToMany(mappedBy = "costumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<Transaction> transactions = new HashSet<>();
 
-    @OneToMany(mappedBy = "costumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<RecurringTransaction> recurringTransactions = new HashSet<>();
 
-    @OneToMany(mappedBy = "costumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<Category> categories = new HashSet<>();
 
-    @OneToMany(mappedBy = "costumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<Budget> budgets = new HashSet<>();
 
     public boolean isLoginCorrect(AuthRequestDTO loginRequest, PasswordEncoder passwordEncoder){
         return passwordEncoder.matches(loginRequest.password(), this.password);
+    }
+
+    public Customer(String name, Currency currency, String email, String password) {
+        this.name = name;
+        this.currency = currency;
+        this.email = email;
+        this.password = password;
     }
 
     @Override
@@ -72,8 +80,8 @@ public class Costumer {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Costumer costumer = (Costumer) o;
-        return getId() != null && Objects.equals(getId(), costumer.getId());
+        Customer customer = (Customer) o;
+        return getId() != null && Objects.equals(getId(), customer.getId());
     }
 
     @Override

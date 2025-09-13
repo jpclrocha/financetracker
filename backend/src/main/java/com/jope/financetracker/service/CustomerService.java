@@ -7,7 +7,7 @@ import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
 import com.jope.financetracker.model.Customer;
 import com.jope.financetracker.model.Role;
-import com.jope.financetracker.repository.CostumerRepository;
+import com.jope.financetracker.repository.CustomerRepository;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -22,15 +22,15 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-public class CostumerService {
+public class CustomerService {
 
     private final CostumerMapper costumerMapper;
-    private final CostumerRepository repository;
+    private final CustomerRepository repository;
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final CurrentUserService currentUserService;
 
-    public CostumerService(CostumerRepository repository, RoleService roleService, BCryptPasswordEncoder passwordEncoder, CostumerMapper costumerMapper, CurrentUserService currentUserService) {
+    public CustomerService(CustomerRepository repository, RoleService roleService, BCryptPasswordEncoder passwordEncoder, CostumerMapper costumerMapper, CurrentUserService currentUserService) {
         this.repository = repository;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;

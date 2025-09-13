@@ -19,8 +19,8 @@ public class RecurringTransaction {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "costumer_id", nullable = false)
-    private Costumer costumer;
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @Column(nullable = false)
     private String description;
@@ -33,6 +33,7 @@ public class RecurringTransaction {
     private Category category;
 
     @Column(name = "frequency", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Frequency frequency;
 
     @Column(name = "start_date", nullable = false)

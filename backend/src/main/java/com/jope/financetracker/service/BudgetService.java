@@ -5,11 +5,11 @@ import com.jope.financetracker.dto.budget.BudgetRequestDTO;
 import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
 import com.jope.financetracker.model.Budget;
-import com.jope.financetracker.model.Costumer;
+import com.jope.financetracker.model.Category;
+import com.jope.financetracker.model.Customer;
 import com.jope.financetracker.repository.BudgetRepository;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,44 +18,43 @@ import java.util.List;
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
-    private final CostumerService costumerService;
+    private final CustomerService customerService;
     private final BudgetMapper budgetMapper;
     private final CurrentUserService currentUserService;
+    private final CategoryService categoryService;
 
-    public BudgetService(BudgetRepository budgetRepository, CostumerService costumerService, BudgetMapper budgetMapper,
-            CurrentUserService currentUserService) {
+    public BudgetService(BudgetRepository budgetRepository, CustomerService customerService,
+                         BudgetMapper budgetMapper, CurrentUserService currentUserService, CategoryService categoryService) {
         this.budgetRepository = budgetRepository;
-        this.costumerService = costumerService;
+        this.customerService = customerService;
         this.budgetMapper = budgetMapper;
         this.currentUserService = currentUserService;
+        this.categoryService = categoryService;
     }
 
     public Budget createBudget(BudgetRequestDTO budgetRequestDTO) {
-        Costumer costumer = costumerService.findById(currentUserService.getCurrentUserId());
+        Customer customer = customerService.findById(currentUserService.getCurrentUserId());
         Budget budget = budgetMapper.budgetRequestDTOToBudget(budgetRequestDTO);
-        budget.setCostumer(costumer);
+        budget.setCustomer(customer);
         return budgetRepository.save(budget);
     }
 
     public Budget getBudgetById(Long id) {
         Budget budget = budgetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-        currentUserService.checkAccess(budget.getCostumer().getId());
-        throw new AccessDeniedException("This budget does not exist, or you do not have the necessary access rights!");
+        currentUserService.checkAccess(budget.getCustomer().getId());
+        return budget;
     }
 
     public List<Budget> getAllBudgets() {
-        return budgetRepository.findAllByCostumerId(currentUserService.getCurrentUserId());
+        return budgetRepository.findAllByCustomerId(currentUserService.getCurrentUserId());
     }
 
     public Budget updateBudget(Long id, BudgetRequestDTO budgetRequestDTO) {
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
 
-        currentUserService.checkAccess(budget.getCostumer().getId());
+        currentUserService.checkAccess(budget.getCustomer().getId());
 
-        Costumer costumer = costumerService.findById(currentUserService.getCurrentUserId());
-
-        budget.setCostumer(costumer);
         budget.setName(budgetRequestDTO.name());
         budget.setAmount(budgetRequestDTO.amount());
         budget.setStartPeriod(budgetRequestDTO.startPeriod());
@@ -64,9 +63,33 @@ public class BudgetService {
         return budgetRepository.save(budget);
     }
 
+    public Budget addCategoryToBudget(Long budgetId,Long categoryId){
+        Budget budget = this.getBudgetById(budgetId);
+        currentUserService.checkAccess(budget.getCustomer().getId());
+
+        Category cat = categoryService.findCategoryById(categoryId, currentUserService.getCurrentUserId());
+        currentUserService.checkAccess(cat.getCustomer().getId());
+
+        budget.addCategory(cat);
+
+        return budgetRepository.save(budget);
+    }
+
+    public void removeCategoryFromBudget(Long budgetId, Long categoryId){
+        Budget budget = this.getBudgetById(budgetId);
+        currentUserService.checkAccess(budget.getCustomer().getId());
+
+        Category cat = categoryService.findCategoryById(categoryId, currentUserService.getCurrentUserId());
+        currentUserService.checkAccess(cat.getCustomer().getId());
+
+        budget.removeCategory(cat);
+
+        budgetRepository.save(budget);
+    }
+
     public void deleteBudget(Long id) {
         Budget b = budgetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Budget not found!"));
-        currentUserService.checkAccess(b.getCostumer().getId());
+        currentUserService.checkAccess(b.getCustomer().getId());
         try {
             budgetRepository.deleteById(id);
         } catch (DataAccessException ex) {

@@ -11,6 +11,6 @@ import com.jope.financetracker.model.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    @Query("SELECT c FROM Category c WHERE c.isPublic = true OR c.costumer.id = :costumerId")
-    List<Category> findAllPublicOrByCostumer(@Param("costumerId") UUID costumerId);
+    @Query("SELECT c FROM Category c WHERE c.isPublic = true OR c.customer.id = :customerId")
+    List<Category> findAllPublicOrByCustomer(@Param("customerId") UUID costumerId);
 }

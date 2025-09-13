@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/transactions")
+@RequestMapping("/transaction")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -31,7 +31,7 @@ public class TransactionController {
                 .createTransaction(transactionRequestDTO)));
     }
 
-    @PostMapping("/installments")
+    @PostMapping("/installment")
     public ResponseEntity<List<InstallmentsTransactionResponseDTO>> createInstallmentsTransaction(
             @RequestBody InstallmentsTransactionRequestDTO transactionRequestDTO) {
         return ResponseEntity.status(201).body(transactionService
@@ -39,7 +39,7 @@ public class TransactionController {
                 .map(transactionMapper::installmentTransactionToTransactionResponseDTO).toList());
     }
 
-    @DeleteMapping("/installments/{groupId}")
+    @DeleteMapping("/installment/{groupId}")
     public ResponseEntity<Void> deleteInstallmentsTransaction(@PathVariable UUID groupId) {
         transactionService.deleteInstallmentsTransaction(groupId);
         return ResponseEntity.noContent().build();
@@ -65,7 +65,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTransaction(@PathVariable("id") Long id) {
         transactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
     }

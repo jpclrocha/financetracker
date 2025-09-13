@@ -6,17 +6,17 @@ import com.jope.financetracker.dto.transaction.TransactionRequestDTO;
 import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
 import com.jope.financetracker.model.Category;
-import com.jope.financetracker.model.Costumer;
-import com.jope.financetracker.model.RecurringTransaction;
+import com.jope.financetracker.model.Customer;
 import com.jope.financetracker.model.Transaction;
+import com.jope.financetracker.projections.TransactionSummaryProjection;
 import com.jope.financetracker.repository.TransactionRepository;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,23 +25,23 @@ import java.util.UUID;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final CostumerService costumerService;
+    private final CustomerService customerService;
     private final CategoryService categoryService;
     private final CurrentUserService currentUserService;
 
-    public TransactionService(TransactionRepository transactionRepository, CostumerService costumerService,
+    public TransactionService(TransactionRepository transactionRepository, CustomerService customerService,
             CategoryService categoryService, CurrentUserService currentUserService) {
         this.transactionRepository = transactionRepository;
-        this.costumerService = costumerService;
+        this.customerService = customerService;
         this.categoryService = categoryService;
         this.currentUserService = currentUserService;
     }
 
     public Transaction createTransaction(TransactionRequestDTO obj) {
-        Costumer cos = costumerService.findById(currentUserService.getCurrentUserId());
+        Customer cos = customerService.findById(currentUserService.getCurrentUserId());
         Category cat = categoryService.findCategoryById(obj.categoryId(), currentUserService.getCurrentUserId());
         Transaction t = new Transaction();
-        t.setCostumer(cos);
+        t.setCustomer(cos);
         t.setCategory(cat);
         t.setAmount(obj.amount());
         t.setDate(obj.date());
@@ -51,7 +51,7 @@ public class TransactionService {
 
     public List<Transaction> createInstallmentsTransaction(InstallmentsTransactionRequestDTO obj) {
         UUID groupId = Generators.timeBasedEpochGenerator().generate();
-        Costumer cos = costumerService.findById(currentUserService.getCurrentUserId());
+        Customer cos = customerService.findById(currentUserService.getCurrentUserId());
         Category cat = categoryService.findCategoryById(obj.categoryId(), currentUserService.getCurrentUserId());
         BigDecimal installmentAmount = obj.amount().divide(BigDecimal.valueOf(obj.installmentTotal()), 2, RoundingMode.HALF_UP);
 
@@ -62,7 +62,7 @@ public class TransactionService {
             transaction.setInstallmentGroupId(groupId);
             transaction.setInstallmentNumber(i);
             transaction.setInstallmentTotal(obj.installmentTotal());
-            transaction.setCostumer(cos);
+            transaction.setCustomer(cos);
             transaction.setCategory(cat);
             transaction.setAmount(installmentAmount);
             transaction.setDescription(obj.description() + " (Installment " + i + " of " + obj.installmentTotal() + ")");
@@ -78,7 +78,7 @@ public class TransactionService {
             throw new IllegalArgumentException("Installments transaction group id must not be null!");
         }
         List<Transaction> list = transactionRepository.findAllByInstallmentGroupId(groupUUID);
-        list.forEach(x -> currentUserService.checkAccess(x.getCostumer().getId()));
+        list.forEach(x -> currentUserService.checkAccess(x.getCustomer().getId()));
         try {
             transactionRepository.deleteByInstallmentGroupId(groupUUID);       
         } catch (DataAccessException ex) {
@@ -88,17 +88,25 @@ public class TransactionService {
 
     public Transaction getTransactionById(Long id) {
         Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-        currentUserService.checkAccess(transaction.getCostumer().getId());
+        currentUserService.checkAccess(transaction.getCustomer().getId());
         return transaction;
     }
 
     public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAllByCostumerId(currentUserService.getCurrentUserId());
+        return transactionRepository.findAllByCustomerId(currentUserService.getCurrentUserId());
+    }
+
+    public List<Transaction> getTransactionsForCustomerBetweenDates(UUID id, LocalDate startDate, LocalDate endDate){
+        return transactionRepository.findTransactionsForCustomerBetweenDates(id, startDate, endDate);
+    }
+
+    public TransactionSummaryProjection getTransactionSummary(UUID id, LocalDate startDate, LocalDate endDate){
+        return transactionRepository.getSummary(id, startDate, endDate);
     }
 
     public Transaction updateTransaction(Long id, Transaction transactionDetails) {
         Transaction transaction = getTransactionById(id);
-        currentUserService.checkAccess(transaction.getCostumer().getId());
+        currentUserService.checkAccess(transaction.getCustomer().getId());
 
         transaction.setCategory(transactionDetails.getCategory());
         transaction.setAmount(transactionDetails.getAmount());
@@ -110,7 +118,7 @@ public class TransactionService {
 
     public void deleteTransaction(Long id) {
         Transaction b = transactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Transaction not found!"));
-        currentUserService.checkAccess(b.getCostumer().getId());
+        currentUserService.checkAccess(b.getCustomer().getId());
         try {
             transactionRepository.deleteById(id);
         } catch (DataAccessException ex) {

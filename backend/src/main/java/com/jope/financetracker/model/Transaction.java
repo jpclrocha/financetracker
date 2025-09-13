@@ -19,8 +19,8 @@ public class Transaction {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "costumer_id", nullable = false)
-    private Costumer costumer;
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)

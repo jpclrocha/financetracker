@@ -7,6 +7,7 @@ import org.hibernate.proxy.HibernateProxy;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -18,8 +19,8 @@ public class Budget {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "costumer_id", nullable = false)
-    private Costumer costumer;
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @Column(nullable = false)
     private String name;
@@ -32,6 +33,14 @@ public class Budget {
 
     @Column(name = "end_period", nullable = false)
     private LocalDate endPeriod;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "budget_categories",
+            joinColumns = @JoinColumn(name = "budget_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories;
 
     @Override
     public final boolean equals(Object o) {
@@ -47,5 +56,13 @@ public class Budget {
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
+
+    public void addCategory(Category category){
+        this.categories.add(category);
+    }
+
+    public void removeCategory(Category category){
+        this.categories.remove(category);
     }
 }

@@ -16,7 +16,7 @@
     <artifactId>financetracker</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>financetracker</name>
-    <description>Finance tracker project</description>
+    <description>Finance Tracker project</description>
 
     <properties>
         <java.version>21</java.version>

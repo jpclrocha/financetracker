@@ -13,7 +13,7 @@ public interface CategoryMapper {
     @Mapping(target = "isPublic", ignore = true)
     @Mapping(target = "transactions", ignore = true)
     @Mapping(target = "recurringTransactions", ignore = true)
-    @Mapping(target = "costumer", ignore = true)
+    @Mapping(target = "customer", ignore = true)
     @Mapping(target = "type", expression = "java(com.jope.financetracker.enums.ExpenseType.valueOf(categoryRequestDTO.type()))")
     Category categoryRequestDTOToCategory(CategoryRequestDTO categoryRequestDTO);
 }

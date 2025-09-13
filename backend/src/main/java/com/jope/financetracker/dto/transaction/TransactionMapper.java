@@ -11,7 +11,7 @@ public interface TransactionMapper {
     @Mapping(target = "isInstallment", expression = "java(transaction.getInstallmentGroupId() != null)")
     TransactionResponseDTO transactionToTransactionResponseDTO(Transaction transaction);
 
-    @Mapping(target = "costumer", ignore = true)
+    @Mapping(target = "customer", ignore = true)
     @Mapping(source = "categoryId", target = "category.id")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "installmentGroupId", ignore = true)
@@ -25,7 +25,7 @@ public interface TransactionMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "installmentGroupId", ignore = true)
     @Mapping(target = "installmentNumber", ignore = true)
-    @Mapping(target = "costumer", ignore = true)
+    @Mapping(target = "customer", ignore = true)
     @Mapping(source = "categoryId", target = "category.id")
     Transaction installmentTransactionRequestDTOToTransaction(InstallmentsTransactionRequestDTO transactionRequestDTO);
 }

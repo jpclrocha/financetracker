@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_roles")
@@ -20,6 +22,9 @@ public class Role {
 
     private String name;
 
+    @ManyToMany(mappedBy = "roles")
+    Set<Customer> customers = new HashSet<>();
+
     @Getter
     public enum Values {
         BASIC(1L),
@@ -31,6 +36,10 @@ public class Role {
             this.roleId = roleId;
         }
 
+    }
+
+    public Role(String name) {
+        this.name = name;
     }
 
     @Override

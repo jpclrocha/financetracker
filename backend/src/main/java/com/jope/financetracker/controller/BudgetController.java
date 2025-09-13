@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/budgets")
+@RequestMapping("/budget")
 public class BudgetController {
 
     private final BudgetService budgetService;
@@ -48,6 +48,24 @@ public class BudgetController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBudget(@PathVariable Long id) {
         budgetService.deleteBudget(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{budgetId}/category/{categoryId}")
+    public ResponseEntity<BudgetResponseDTO> addCategoryToBudget(@PathVariable("budgetId") Long budgetId, @PathVariable("categoryId") Long categoryId) {
+        return ResponseEntity
+                .status(201)
+                .body(
+                        budgetMapper
+                                .budgetToBudgetResponseDTO(
+                                        budgetService.addCategoryToBudget(budgetId, categoryId)
+                                )
+                );
+    }
+
+    @DeleteMapping("/{budgetId}/category/{categoryId}")
+    public ResponseEntity<Void> removeCategoryFromBudget(@PathVariable("budgetId") Long budgetId, @PathVariable("categoryId") Long categoryId) {
+        budgetService.removeCategoryFromBudget(budgetId, categoryId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.jope.financetracker.model.Budget;
 
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
-    List<Budget> findAllByCostumerId(UUID costumerId);
+    List<Budget> findAllByCustomerId(UUID costumerId);
 }

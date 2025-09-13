@@ -6,7 +6,7 @@ import com.jope.financetracker.enums.ExpenseType;
 import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
 import com.jope.financetracker.model.Category;
-import com.jope.financetracker.model.Costumer;
+import com.jope.financetracker.model.Customer;
 import com.jope.financetracker.repository.CategoryRepository;
 
 import org.springframework.dao.DataAccessException;
@@ -22,22 +22,23 @@ import java.util.UUID;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final CostumerService costumerService;
+    private final CustomerService customerService;
     private final CategoryMapper categoryMapper;
     private final CurrentUserService currentUserService;
 
-    public CategoryService(CategoryRepository categoryRepository, CostumerService costumerService,
-            CategoryMapper categoryMapper, CurrentUserService currentUserService) {
+    public CategoryService(CategoryRepository categoryRepository, CustomerService customerService,
+                           CategoryMapper categoryMapper, CurrentUserService currentUserService) {
         this.categoryRepository = categoryRepository;
-        this.costumerService = costumerService;
+        this.customerService = customerService;
         this.categoryMapper = categoryMapper;
         this.currentUserService = currentUserService;
     }
 
     public Category createCategory(CategoryRequestDTO categoryRequestDTO) {
-        Costumer costumer = costumerService.findById(currentUserService.getCurrentUserId());
+        Customer customer = customerService.findById(currentUserService.getCurrentUserId());
         Category category = categoryMapper.categoryRequestDTOToCategory(categoryRequestDTO);
-        category.setCostumer(costumer);
+
+        category.setCustomer(customer);
         category.setIsPublic(false);
         return categoryRepository.save(category);
     }
@@ -45,7 +46,7 @@ public class CategoryService {
     @PreAuthorize("@currentUserService.isAdmin()")
     public Category createPublicCategory(CategoryRequestDTO categoryRequestDTO) {
         Category category = categoryMapper.categoryRequestDTOToCategory(categoryRequestDTO);
-        category.setCostumer(null);
+        category.setCustomer(null);
         category.setIsPublic(true);
         return categoryRepository.save(category);
     }
@@ -55,7 +56,7 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException(id));
 
         if (Boolean.FALSE.equals(c.getIsPublic())
-                && (costumerId == null || !c.getCostumer().getId().equals(costumerId))) {
+                && (costumerId == null || !c.getCustomer().getId().equals(costumerId))) {
             throw new AccessDeniedException("This costumer does not own this category!");
         }
 
@@ -63,13 +64,13 @@ public class CategoryService {
     }
 
     public List<Category> getAllCategories() {
-        return categoryRepository.findAllPublicOrByCostumer(currentUserService.getCurrentUserId());
+        return categoryRepository.findAllPublicOrByCustomer(currentUserService.getCurrentUserId());
     }
 
     public Category updateCategory(Long id, CategoryRequestDTO categoryRequestDTO) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        currentUserService.checkAccess(category.getCostumer().getId());
+        currentUserService.checkAccess(category.getCustomer().getId());
 
         category.setName(categoryRequestDTO.name());
         category.setType(ExpenseType.valueOf(categoryRequestDTO.type()));
@@ -79,7 +80,7 @@ public class CategoryService {
 
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-        currentUserService.checkAccess(category.getCostumer().getId());
+        currentUserService.checkAccess(category.getCustomer().getId());
         try {
             categoryRepository.deleteById(id);
         } catch (DataAccessException e) {

@@ -19,9 +19,9 @@ public class Category {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "costumer_id")
+    @JoinColumn(name = "customer_id")
     // null if the category is public
-    private Costumer costumer;
+    private Customer customer;
 
     @Column(name = "is_public", nullable = false, updatable = false)
     private Boolean isPublic = false;
@@ -30,8 +30,11 @@ public class Category {
     private String name;
 
     @Column(name = "type")
+    @Enumerated(EnumType.STRING)
     private ExpenseType type;
 
+    @ManyToMany(mappedBy = "categories")
+    Set<Budget> budgets;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

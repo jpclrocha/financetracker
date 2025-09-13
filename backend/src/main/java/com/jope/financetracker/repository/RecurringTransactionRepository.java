@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface RecurringTransactionRepository  extends JpaRepository<RecurringTransaction, Long> {
-    List<RecurringTransaction> findAllByCostumerId(UUID id);
+    List<RecurringTransaction> findAllByCustomerId(UUID id);
 }

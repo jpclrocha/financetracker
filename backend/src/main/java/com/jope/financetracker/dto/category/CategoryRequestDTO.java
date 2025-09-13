@@ -2,6 +2,9 @@ package com.jope.financetracker.dto.category;
 
 import com.jope.financetracker.enums.ExpenseType;
 import com.jope.financetracker.validations.constraints.value_of_enum.ValueOfEnum;
+import jakarta.annotation.Nullable;
+
+import java.util.List;
 
 
 public record CategoryRequestDTO(

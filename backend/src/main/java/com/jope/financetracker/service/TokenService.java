@@ -2,7 +2,7 @@ package com.jope.financetracker.service;
 
 import com.fasterxml.uuid.Generators;
 import com.jope.financetracker.exceptions.InvalidTokenException;
-import com.jope.financetracker.model.Costumer;
+import com.jope.financetracker.model.Customer;
 import com.jope.financetracker.model.RefreshToken;
 import com.jope.financetracker.model.Role;
 import com.jope.financetracker.repository.RefreshTokenRepository;
@@ -52,28 +52,28 @@ public class TokenService {
         refreshTokenRepository.delete(token);
     }
 
-    public String createToken(Costumer costumer){
-        var scopes = costumer.getRoles().stream().map(Role::getName).collect(Collectors.joining(" "));
+    public String createToken(Customer customer){
+        var scopes = customer.getRoles().stream().map(Role::getName).collect(Collectors.joining(" "));
 
         Instant now = Instant.now();
 
         var claims = JwtClaimsSet
                 .builder()
                 .issuer("financetracker_backend")
-                .subject(costumer.getId().toString())
+                .subject(customer.getId().toString())
                 .issuedAt(now)
                 .expiresAt(now.plusMillis(accessTokenExpiration))
                 .claim("scope", scopes)
-                .claim("email", costumer.getEmail())
+                .claim("email", customer.getEmail())
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-    public RefreshToken createRefreshToken(Costumer costumer) {
+    public RefreshToken createRefreshToken(Customer customer) {
         String token = Generators.timeBasedEpochGenerator().generate().toString();
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setCostumer(costumer);
+        refreshToken.setCustomer(customer);
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenExpiration));
         refreshToken.setToken(token);
         return refreshTokenRepository.save(refreshToken);
@@ -81,6 +81,6 @@ public class TokenService {
 
     @Transactional
     public void revokeAllTokensForUser(UUID userId){
-        refreshTokenRepository.deleteAllByCostumerId(userId);
+        refreshTokenRepository.deleteAllByCustomerId(userId);
     }
 }

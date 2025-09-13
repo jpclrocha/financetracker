@@ -10,6 +10,6 @@ public interface BudgetMapper {
     BudgetResponseDTO budgetToBudgetResponseDTO(Budget budget);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "costumer", ignore = true)
+    @Mapping(target = "customer", ignore = true)
     Budget budgetRequestDTOToBudget(BudgetRequestDTO budgetRequestDTO);
 }
