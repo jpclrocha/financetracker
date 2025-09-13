@@ -13,4 +13,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query("SELECT c FROM Category c WHERE c.isPublic = true OR c.customer.id = :customerId")
     List<Category> findAllPublicOrByCustomer(@Param("customerId") UUID costumerId);
+
+    boolean existsByNameAndIsPublic(String name, boolean isPublic);
 }
