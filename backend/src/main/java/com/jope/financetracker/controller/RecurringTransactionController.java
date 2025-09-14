@@ -3,6 +3,8 @@ package com.jope.financetracker.controller;
 import com.jope.financetracker.dto.recurringtransaction.RecurringTransactionMapper;
 import com.jope.financetracker.dto.recurringtransaction.RecurringTransactionRequestDTO;
 import com.jope.financetracker.dto.recurringtransaction.RecurringTransactionResponseDTO;
+import com.jope.financetracker.dto.recurringtransaction.RecurringTransactionUpdateDTO;
+import com.jope.financetracker.model.RecurringTransaction;
 import com.jope.financetracker.service.RecurringTransactionService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -22,28 +24,31 @@ public class RecurringTransactionController {
         this.recurringTransactionMapper = recurringTransactionMapper;
     }
 
-    @PostMapping
-    public ResponseEntity<RecurringTransactionResponseDTO> createRecurringTransaction(@RequestBody @Valid RecurringTransactionRequestDTO recurringTransactionRequestDTO) {
-        return ResponseEntity.status(201).body(recurringTransactionMapper.recurringTransactionToRecurringTransactionResponseDTO(recurringTransactionService.createRecurringTransaction(recurringTransactionRequestDTO)));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<RecurringTransactionResponseDTO> getRecurringTransactionById(@PathVariable Long id) {
-        return ResponseEntity.ok(recurringTransactionMapper.recurringTransactionToRecurringTransactionResponseDTO(recurringTransactionService.getRecurringTransactionById(id)));
-    }
-
     @GetMapping
     public ResponseEntity<List<RecurringTransactionResponseDTO>> getAllRecurringTransactions() {
         return ResponseEntity.ok(recurringTransactionService.getAllRecurringTransactions().stream().map(recurringTransactionMapper::recurringTransactionToRecurringTransactionResponseDTO).toList());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<RecurringTransactionResponseDTO> getRecurringTransactionById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(recurringTransactionMapper.recurringTransactionToRecurringTransactionResponseDTO(recurringTransactionService.getRecurringTransactionById(id)));
+    }
+
+    @PostMapping
+    public ResponseEntity<RecurringTransactionResponseDTO> createRecurringTransaction(@RequestBody @Valid RecurringTransactionRequestDTO recurringTransactionRequestDTO) {
+        return ResponseEntity.status(201).body(recurringTransactionMapper.recurringTransactionToRecurringTransactionResponseDTO(recurringTransactionService.createRecurringTransaction(recurringTransactionRequestDTO)));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<RecurringTransactionResponseDTO> updateRecurringTransaction(@PathVariable Long id, @RequestBody RecurringTransactionRequestDTO transactionDetails) {
-        return ResponseEntity.ok(recurringTransactionMapper.recurringTransactionToRecurringTransactionResponseDTO(recurringTransactionService.updateRecurringTransaction(id, recurringTransactionMapper.recurringTransactionRequestDTOToRecurringTransaction(transactionDetails))));
+    public ResponseEntity<RecurringTransactionResponseDTO> updateRecurringTransaction(@PathVariable("id") Long id, @RequestBody RecurringTransactionUpdateDTO transactionDetails) {
+        return ResponseEntity.ok(
+                recurringTransactionMapper.recurringTransactionToRecurringTransactionResponseDTO(
+                        recurringTransactionService.updateRecurringTransaction(id, transactionDetails)
+                ));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRecurringTransaction(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteRecurringTransaction(@PathVariable("id") Long id) {
         recurringTransactionService.deleteRecurringTransaction(id);
         return ResponseEntity.noContent().build();
     }

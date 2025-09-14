@@ -5,5 +5,6 @@ import com.jope.financetracker.enums.ExpenseType;
 public record CategoryResponseDTO(
     Long id,
     String name,
-    ExpenseType type
+    ExpenseType type,
+    boolean isPublic
 ) {}

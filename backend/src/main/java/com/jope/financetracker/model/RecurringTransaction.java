@@ -1,5 +1,6 @@
 package com.jope.financetracker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jope.financetracker.enums.Frequency;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,6 +8,8 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -29,7 +32,7 @@ public class RecurringTransaction {
     private BigDecimal amount;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @Column(name = "frequency", nullable = false)
@@ -43,7 +46,13 @@ public class RecurringTransaction {
     private LocalDate nextDueDate;
 
     @Column(name = "is_subscription", nullable = false)
-    private Boolean isSubscripion;
+    private Boolean isSubscription;
+
+    private boolean isActive = true;
+
+    @OneToMany(mappedBy = "recurringTransaction", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Important: Prevents infinite loops when converting to JSON
+    private List<Transaction> transactions = new ArrayList<>();
 
     @Override
     public final boolean equals(Object o) {

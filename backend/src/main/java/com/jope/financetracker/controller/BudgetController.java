@@ -21,10 +21,10 @@ public class BudgetController {
         this.budgetMapper = budgetMapper;
     }
 
-    @PostMapping
-    public ResponseEntity<BudgetResponseDTO> createBudget(@RequestBody BudgetRequestDTO budget) {
-        return ResponseEntity.status(201).body(budgetMapper
-                .budgetToBudgetResponseDTO(budgetService.createBudget(budget)));
+    @GetMapping
+    public ResponseEntity<List<BudgetResponseDTO>> getAllBudgets() {
+        return ResponseEntity
+                .ok(budgetService.getAllBudgets().stream().map(budgetMapper::budgetToBudgetResponseDTO).toList());
     }
 
     @GetMapping("/{id}")
@@ -32,10 +32,10 @@ public class BudgetController {
         return ResponseEntity.ok(budgetMapper.budgetToBudgetResponseDTO(budgetService.getBudgetById(id)));
     }
 
-    @GetMapping
-    public ResponseEntity<List<BudgetResponseDTO>> getAllBudgets() {
-        return ResponseEntity
-                .ok(budgetService.getAllBudgets().stream().map(budgetMapper::budgetToBudgetResponseDTO).toList());
+    @PostMapping
+    public ResponseEntity<BudgetResponseDTO> createBudget(@RequestBody BudgetRequestDTO budget) {
+        return ResponseEntity.status(201).body(budgetMapper
+                .budgetToBudgetResponseDTO(budgetService.createBudget(budget)));
     }
 
     @PutMapping("/{id}")

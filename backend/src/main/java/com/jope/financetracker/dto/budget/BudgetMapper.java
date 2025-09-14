@@ -11,5 +11,6 @@ public interface BudgetMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "customer", ignore = true)
+    @Mapping(target = "categories", ignore = true)
     Budget budgetRequestDTOToBudget(BudgetRequestDTO budgetRequestDTO);
 }

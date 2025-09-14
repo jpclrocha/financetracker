@@ -41,7 +41,7 @@ public class Customer {
         joinColumns = @JoinColumn(name = "customer_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
         )
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();

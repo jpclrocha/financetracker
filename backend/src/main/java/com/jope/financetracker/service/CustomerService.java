@@ -1,7 +1,7 @@
 package com.jope.financetracker.service;
 
-import com.jope.financetracker.dto.costumer.CostumerMapper;
-import com.jope.financetracker.dto.costumer.CostumerRequestDTO;
+import com.jope.financetracker.dto.customer.CustomerMapper;
+import com.jope.financetracker.dto.customer.CustomerRequestDTO;
 import com.jope.financetracker.enums.Currency;
 import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
@@ -16,26 +16,27 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class CustomerService {
 
-    private final CostumerMapper costumerMapper;
+    private final CustomerMapper customerMapper;
     private final CustomerRepository repository;
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final CurrentUserService currentUserService;
+    private final TokenService tokenService;
 
-    public CustomerService(CustomerRepository repository, RoleService roleService, BCryptPasswordEncoder passwordEncoder, CostumerMapper costumerMapper, CurrentUserService currentUserService) {
+    public CustomerService(CustomerMapper customerMapper, CustomerRepository repository,
+                           RoleService roleService, BCryptPasswordEncoder passwordEncoder,
+                           CurrentUserService currentUserService, TokenService tokenService) {
+        this.customerMapper = customerMapper;
         this.repository = repository;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
-        this.costumerMapper = costumerMapper;
         this.currentUserService = currentUserService;
+        this.tokenService = tokenService;
     }
 
     @PreAuthorize("@currentUserService.isAdmin()")
@@ -53,28 +54,31 @@ public class CustomerService {
         return repository.findByEmail(email);
     }
 
-    public Customer createCostumer(CostumerRequestDTO costumerRequestDTO) {
+    public Customer createCostumer(CustomerRequestDTO customerRequestDTO) {
         Role r = roleService.findByName(Role.Values.BASIC.name());
-        Optional<Customer> opt = this.findByEmail(costumerRequestDTO.email());
+        Optional<Customer> opt = this.findByEmail(customerRequestDTO.email());
 
         if(opt.isPresent()){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        Customer customer = costumerMapper.costumerRequestDTOToCostumer(costumerRequestDTO);
-        customer.setPassword(passwordEncoder.encode(costumerRequestDTO.password()));
+        Customer customer = customerMapper.costumerRequestDTOToCostumer(customerRequestDTO);
+        customer.setPassword(passwordEncoder.encode(customerRequestDTO.password()));
         customer.setRoles(Set.of(r));
         return repository.save(customer);
     }
 
-    public Customer updateCostumer(UUID id, CostumerRequestDTO costumerRequestDTO) {
+    public Customer updateCostumer(UUID id, CustomerRequestDTO customerRequestDTO) {
         currentUserService.checkAccess(id);
 
         Customer customer = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        if(!Objects.equals(customer.getEmail(), customerRequestDTO.email()) && repository.existsByEmail(customerRequestDTO.email())){
+            throw new DatabaseException("This email is already in use!");
+        }
 
-        customer.setName(costumerRequestDTO.name());
-        customer.setEmail(costumerRequestDTO.email());
-        customer.setCurrency(Currency.valueOf(costumerRequestDTO.currency()));
+        customer.setName(customerRequestDTO.name());
+        customer.setEmail(customerRequestDTO.email());
+        customer.setCurrency(Currency.valueOf(customerRequestDTO.currency()));
 
         return repository.save(customer);
     }
@@ -82,6 +86,7 @@ public class CustomerService {
     public void deleteCostumer(UUID id) {
         currentUserService.checkAccess(id);
         try {
+            tokenService.revokeAllTokensForUser(id);
             repository.deleteById(id);
         } catch (DataAccessException ex) {
             throw new DatabaseException("Failed to delete costumer: " + id);

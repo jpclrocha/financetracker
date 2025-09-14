@@ -2,7 +2,10 @@ package com.jope.financetracker.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,8 +25,9 @@ public class Transaction {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @Nullable
     private Category category;
 
     private BigDecimal amount;
@@ -41,6 +45,10 @@ public class Transaction {
     
     @Column(nullable = true)
     private Integer installmentTotal;
+
+    @ManyToOne(fetch = FetchType.LAZY) // LAZY is good for performance
+    @JoinColumn(name = "recurring_transaction_id") // Name of the foreign key column in the DB
+    private RecurringTransaction recurringTransaction;
 
     @Override
     public final boolean equals(Object o) {

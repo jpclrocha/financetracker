@@ -40,21 +40,29 @@ public class DBConfig implements CommandLineRunner {
         boolean isBasicUserCreated = customerRepository.existsByEmail("basic@gmail.com");
 
         if(!isAdminUserCreated){
-            customerRepository.save(new Customer(
-                "JOPE ADMIN",
-                Currency.BRL,
-                "admin@gmail.com",
-                passwordEncoder.encode("12345678")
-            ));
+            Customer customer = new Customer(
+                    "JOPE ADMIN",
+                    Currency.BRL,
+                    "admin@gmail.com",
+                    passwordEncoder.encode("12345678")
+            );
+            customer = customerRepository.save(customer);
+            Role r = roleRepository.findByName(Role.Values.ADMIN.name()).orElseThrow();
+            customer.getRoles().add(r);
+            customerRepository.save(customer);
         }
 
         if(!isBasicUserCreated){
-            customerRepository.save(new Customer(
+            Customer customer = new Customer(
                     "JOPE BASIC",
                     Currency.BRL,
                     "basic@gmail.com",
                     passwordEncoder.encode("12345678")
-            ));
+            );
+            customer = customerRepository.save(customer);
+            Role r = roleRepository.findByName(Role.Values.BASIC.name()).orElseThrow();
+            customer.getRoles().add(r);
+            customerRepository.save(customer);
         }
 
         final String PUBLIC_CATEGORY_1 = "Groceries";

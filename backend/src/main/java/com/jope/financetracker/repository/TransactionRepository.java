@@ -2,12 +2,14 @@ package com.jope.financetracker.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.jope.financetracker.projections.TransactionSummaryProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.jope.financetracker.model.Transaction;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,6 +18,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     void deleteByInstallmentGroupId(UUID groupId);
     List<Transaction> findAllByCustomerId(UUID id);
     List<Transaction> findAllByInstallmentGroupId(UUID uuid);
+    List<Transaction> findAllByCustomerIdAndInstallmentGroupIdNotNull(UUID customerId);
 
     @Query("SELECT t FROM Transaction t WHERE t.customer.id = :customerId AND t.date BETWEEN :startDate AND :endDate")
     List<Transaction> findTransactionsForCustomerBetweenDates(
@@ -42,4 +45,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @Query("SELECT MAX(t.date) FROM Transaction t WHERE t.recurringTransaction.id = :recurringId")
+    Optional<LocalDate> findMostRecentTransactionDateByRecurringId(@Param("recurringId") Long recurringId);
 }

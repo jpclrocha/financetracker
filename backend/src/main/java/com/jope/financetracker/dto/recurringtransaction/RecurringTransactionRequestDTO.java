@@ -17,13 +17,7 @@ public record RecurringTransactionRequestDTO(
     @ValueOfEnum(enumClass = Frequency.class, message = "Invalid value for Frequency")
     String frequency,
     LocalDate startDate,
-    LocalDate nextDueDate,
     @NotNull(message = "Is subscription field is required!")
-    Boolean isSubscripion
+    Boolean isSubscription
 ) {
-    @AssertTrue(message = "nextDueDate must be equal or after startDate")
-    public boolean isNextDueDateValid() {
-        if (startDate == null || nextDueDate == null) return true; // null handled elsewhere
-        return !nextDueDate.isBefore(startDate);
-    }
 }

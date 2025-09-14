@@ -44,6 +44,13 @@ public class Category {
     @ToString.Exclude
     private Set<RecurringTransaction> recurringTransactions = new HashSet<>();
 
+    public Category(Customer customer, Boolean isPublic, String name, ExpenseType type) {
+        this.customer = customer;
+        this.isPublic = isPublic;
+        this.name = name;
+        this.type = type;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

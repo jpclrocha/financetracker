@@ -24,6 +24,24 @@ public class TransactionController {
         this.transactionMapper = transactionMapper;
     }
 
+    @GetMapping
+    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions() {
+        return ResponseEntity.ok(transactionService.getAllTransactions().stream()
+                .map(transactionMapper::transactionToTransactionResponseDTO).toList());
+    }
+
+    @GetMapping("/installments")
+    public ResponseEntity<List<InstallmentsTransactionResponseDTO>> getAllInstallmentsTransactions() {
+        return ResponseEntity.ok(transactionService.getAllInstallmentsTransaction().stream()
+                .map(transactionMapper::installmentTransactionToTransactionResponseDTO).toList());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TransactionResponseDTO> getTransactionById(@PathVariable Long id) {
+        return ResponseEntity
+                .ok(transactionMapper.transactionToTransactionResponseDTO(transactionService.getTransactionById(id)));
+    }
+
     @PostMapping
     public ResponseEntity<TransactionResponseDTO> createTransaction(
             @RequestBody TransactionRequestDTO transactionRequestDTO) {
@@ -39,34 +57,22 @@ public class TransactionController {
                 .map(transactionMapper::installmentTransactionToTransactionResponseDTO).toList());
     }
 
-    @DeleteMapping("/installment/{groupId}")
-    public ResponseEntity<Void> deleteInstallmentsTransaction(@PathVariable UUID groupId) {
-        transactionService.deleteInstallmentsTransaction(groupId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<TransactionResponseDTO> getTransactionById(@PathVariable Long id) {
-        return ResponseEntity
-                .ok(transactionMapper.transactionToTransactionResponseDTO(transactionService.getTransactionById(id)));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions() {
-        return ResponseEntity.ok(transactionService.getAllTransactions().stream()
-                .map(transactionMapper::transactionToTransactionResponseDTO).toList());
-    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<TransactionResponseDTO> updateTransaction(@PathVariable Long id,
+    public ResponseEntity<TransactionResponseDTO> updateTransaction(@PathVariable("id") Long id,
             @RequestBody TransactionRequestDTO transactionRequestDTO) {
         return ResponseEntity.ok(transactionMapper.transactionToTransactionResponseDTO(transactionService
-                .updateTransaction(id, transactionMapper.transactionRequestDTOToTransaction(transactionRequestDTO))));
+                .updateTransaction(id, transactionRequestDTO)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTransaction(@PathVariable("id") Long id) {
         transactionService.deleteTransaction(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/installment/{groupId}")
+    public ResponseEntity<Void> deleteInstallmentsTransaction(@PathVariable("groupId") UUID groupId) {
+        transactionService.deleteInstallmentsTransaction(groupId);
         return ResponseEntity.noContent().build();
     }
 }

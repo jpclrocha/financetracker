@@ -7,18 +7,21 @@ import com.jope.financetracker.exceptions.DatabaseException;
 import com.jope.financetracker.exceptions.ResourceNotFoundException;
 import com.jope.financetracker.model.Category;
 import com.jope.financetracker.model.Customer;
+import com.jope.financetracker.model.RecurringTransaction;
 import com.jope.financetracker.model.Transaction;
 import com.jope.financetracker.projections.TransactionSummaryProjection;
 import com.jope.financetracker.repository.TransactionRepository;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -39,7 +42,10 @@ public class TransactionService {
 
     public Transaction createTransaction(TransactionRequestDTO obj) {
         Customer cos = customerService.findById(currentUserService.getCurrentUserId());
-        Category cat = categoryService.findCategoryById(obj.categoryId(), currentUserService.getCurrentUserId());
+        Category cat = null;
+        if(obj.categoryId() != null){
+            cat = categoryService.findCategoryById(obj.categoryId());
+        }
         Transaction t = new Transaction();
         t.setCustomer(cos);
         t.setCategory(cat);
@@ -49,10 +55,29 @@ public class TransactionService {
         return transactionRepository.save(t);
     }
 
+    public void createRecurringTransaction(TransactionRequestDTO obj, RecurringTransaction rt){
+        Customer cos = customerService.findById(currentUserService.getCurrentUserId());
+        Category cat = null;
+        if(obj.categoryId() != null){
+            cat = categoryService.findCategoryById(obj.categoryId());
+        }
+        Transaction t = new Transaction();
+        t.setCustomer(cos);
+        t.setCategory(cat);
+        t.setAmount(obj.amount());
+        t.setDate(obj.date());
+        t.setDescription(obj.description());
+        t.setRecurringTransaction(rt);
+        transactionRepository.save(t);
+    }
+
     public List<Transaction> createInstallmentsTransaction(InstallmentsTransactionRequestDTO obj) {
         UUID groupId = Generators.timeBasedEpochGenerator().generate();
         Customer cos = customerService.findById(currentUserService.getCurrentUserId());
-        Category cat = categoryService.findCategoryById(obj.categoryId(), currentUserService.getCurrentUserId());
+        Category cat = null;
+        if(obj.categoryId() != null){
+            cat = categoryService.findCategoryById(obj.categoryId());
+        }
         BigDecimal installmentAmount = obj.amount().divide(BigDecimal.valueOf(obj.installmentTotal()), 2, RoundingMode.HALF_UP);
 
         List<Transaction> transactionsToSave = new ArrayList<>();
@@ -73,6 +98,7 @@ public class TransactionService {
         return transactionRepository.saveAll(transactionsToSave);
     }
 
+    @Transactional
     public void deleteInstallmentsTransaction(UUID groupUUID) {
         if (groupUUID == null) {
             throw new IllegalArgumentException("Installments transaction group id must not be null!");
@@ -80,7 +106,7 @@ public class TransactionService {
         List<Transaction> list = transactionRepository.findAllByInstallmentGroupId(groupUUID);
         list.forEach(x -> currentUserService.checkAccess(x.getCustomer().getId()));
         try {
-            transactionRepository.deleteByInstallmentGroupId(groupUUID);       
+            transactionRepository.deleteByInstallmentGroupId(groupUUID);
         } catch (DataAccessException ex) {
             throw new DatabaseException("Failed to delete transactions for groupUUID: " + groupUUID);
         }
@@ -96,6 +122,10 @@ public class TransactionService {
         return transactionRepository.findAllByCustomerId(currentUserService.getCurrentUserId());
     }
 
+    public List<Transaction> getAllInstallmentsTransaction(){
+        return transactionRepository.findAllByCustomerIdAndInstallmentGroupIdNotNull(currentUserService.getCurrentUserId());
+    }
+
     public List<Transaction> getTransactionsForCustomerBetweenDates(UUID id, LocalDate startDate, LocalDate endDate){
         return transactionRepository.findTransactionsForCustomerBetweenDates(id, startDate, endDate);
     }
@@ -104,14 +134,18 @@ public class TransactionService {
         return transactionRepository.getSummary(id, startDate, endDate);
     }
 
-    public Transaction updateTransaction(Long id, Transaction transactionDetails) {
+    public Transaction updateTransaction(Long id, TransactionRequestDTO transactionDetails) {
         Transaction transaction = getTransactionById(id);
         currentUserService.checkAccess(transaction.getCustomer().getId());
 
-        transaction.setCategory(transactionDetails.getCategory());
-        transaction.setAmount(transactionDetails.getAmount());
-        transaction.setDate(transactionDetails.getDate());
-        transaction.setDescription(transactionDetails.getDescription());
+        Category cat = null;
+        if(transactionDetails.categoryId() != null){
+            cat = categoryService.findCategoryById(transactionDetails.categoryId());
+        }
+        transaction.setCategory(cat);
+        transaction.setAmount(transactionDetails.amount());
+        transaction.setDate(transactionDetails.date());
+        transaction.setDescription(transactionDetails.description());
 
         return transactionRepository.save(transaction);
     }
@@ -124,5 +158,9 @@ public class TransactionService {
         } catch (DataAccessException ex) {
             throw new DatabaseException("Failed to delete transaction: " + id);
         }
+    }
+
+    public Optional<LocalDate> findMostRecentTransactionDateByRecurringId(Long id) {
+        return transactionRepository.findMostRecentTransactionDateByRecurringId(id);
     }
 }

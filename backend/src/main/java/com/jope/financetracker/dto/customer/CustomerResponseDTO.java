@@ -1,8 +1,8 @@
-package com.jope.financetracker.dto.costumer;
+package com.jope.financetracker.dto.customer;
 
 import java.util.UUID;
 
-public record CostumerResponseDTO(
+public record CustomerResponseDTO(
     UUID id,
     String name,
     String email,

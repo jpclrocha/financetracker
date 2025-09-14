@@ -21,28 +21,28 @@ public class CategoryController {
         this.categoryMapper = categoryMapper;
     }
 
-    @PostMapping
-    public ResponseEntity<CategoryResponseDTO> createCategory(@RequestBody CategoryRequestDTO category) {
-        return ResponseEntity.status(201).body(categoryMapper.categoryToCategoryResponseDTO(categoryService.createCategory(category)));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long id) {
-        return ResponseEntity.ok(categoryMapper.categoryToCategoryResponseDTO(categoryService.findCategoryById(id, null)));
-    }
-
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories().stream().map(categoryMapper::categoryToCategoryResponseDTO).toList());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(categoryMapper.categoryToCategoryResponseDTO(categoryService.findCategoryById(id)));
+    }
+
+    @PostMapping
+    public ResponseEntity<CategoryResponseDTO> createCategory(@RequestBody CategoryRequestDTO category) {
+        return ResponseEntity.status(201).body(categoryMapper.categoryToCategoryResponseDTO(categoryService.createCategory(category)));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryRequestDTO categoryDetails) {
+    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable("id") Long id, @RequestBody CategoryRequestDTO categoryDetails) {
         return ResponseEntity.ok(categoryMapper.categoryToCategoryResponseDTO(categoryService.updateCategory(id, categoryDetails)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable("id") Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }

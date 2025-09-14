@@ -67,7 +67,7 @@ public class BudgetService {
         Budget budget = this.getBudgetById(budgetId);
         currentUserService.checkAccess(budget.getCustomer().getId());
 
-        Category cat = categoryService.findCategoryById(categoryId, currentUserService.getCurrentUserId());
+        Category cat = categoryService.findCategoryById(categoryId);
         currentUserService.checkAccess(cat.getCustomer().getId());
 
         budget.addCategory(cat);
@@ -79,13 +79,17 @@ public class BudgetService {
         Budget budget = this.getBudgetById(budgetId);
         currentUserService.checkAccess(budget.getCustomer().getId());
 
-        Category cat = categoryService.findCategoryById(categoryId, currentUserService.getCurrentUserId());
+        Category cat = categoryService.findCategoryById(categoryId);
         currentUserService.checkAccess(cat.getCustomer().getId());
 
         budget.removeCategory(cat);
 
         budgetRepository.save(budget);
     }
+
+//    public void unlinkCategory(Long categoryId){
+//        budgetRepository.setCategoryToNull(categoryId);
+//    }
 
     public void deleteBudget(Long id) {
         Budget b = budgetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Budget not found!"));

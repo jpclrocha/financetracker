@@ -1,4 +1,4 @@
-package com.jope.financetracker.dto.costumer;
+package com.jope.financetracker.dto.customer;
 
 import com.jope.financetracker.enums.Currency;
 import com.jope.financetracker.validations.constraints.value_of_enum.ValueOfEnum;
@@ -6,7 +6,7 @@ import com.jope.financetracker.validations.constraints.value_of_enum.ValueOfEnum
 import jakarta.validation.constraints.NotBlank;
 
 
-public record CostumerRequestDTO(
+public record CustomerRequestDTO(
     @NotBlank(message = "Name is required!")
     String name,
     @NotBlank(message = "Email is required!")
