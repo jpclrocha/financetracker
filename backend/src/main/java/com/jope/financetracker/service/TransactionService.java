@@ -13,6 +13,7 @@ import com.jope.financetracker.projections.TransactionSummaryProjection;
 import com.jope.financetracker.repository.TransactionRepository;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,8 +119,8 @@ public class TransactionService {
         return transaction;
     }
 
-    public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAllByCustomerId(currentUserService.getCurrentUserId());
+    public List<Transaction> getAllTransactions(Pageable pageable) {
+        return transactionRepository.findAllByCustomerId(currentUserService.getCurrentUserId(), pageable).getContent();
     }
 
     public List<Transaction> getAllInstallmentsTransaction(){

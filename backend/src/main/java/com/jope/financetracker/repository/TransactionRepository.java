@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.jope.financetracker.projections.TransactionSummaryProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.jope.financetracker.model.Transaction;
@@ -17,6 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     void deleteByInstallmentGroupId(UUID groupId);
     List<Transaction> findAllByCustomerId(UUID id);
+    Page<Transaction> findAllByCustomerId(UUID id, Pageable pageable);
     List<Transaction> findAllByInstallmentGroupId(UUID uuid);
     List<Transaction> findAllByCustomerIdAndInstallmentGroupIdNotNull(UUID customerId);
 

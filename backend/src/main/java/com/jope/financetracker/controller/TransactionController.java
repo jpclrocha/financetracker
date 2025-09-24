@@ -6,6 +6,7 @@ import com.jope.financetracker.dto.transaction.TransactionMapper;
 import com.jope.financetracker.dto.transaction.TransactionRequestDTO;
 import com.jope.financetracker.dto.transaction.TransactionResponseDTO;
 import com.jope.financetracker.service.TransactionService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +26,8 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions() {
-        return ResponseEntity.ok(transactionService.getAllTransactions().stream()
+    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(Pageable pageable) {
+        return ResponseEntity.ok(transactionService.getAllTransactions(pageable).stream()
                 .map(transactionMapper::transactionToTransactionResponseDTO).toList());
     }
 
