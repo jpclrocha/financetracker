@@ -30,7 +30,7 @@ export const Navigation = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <div className="bg-primary rounded-lg p-2">
-                <DollarSign className="h-6 w-6 text-primary-foreground" />
+                <DollarSign className="size-6 text-golden" />
               </div>
               <span className="text-xl font-bold text-foreground">FinanceHub</span>
             </Link>
