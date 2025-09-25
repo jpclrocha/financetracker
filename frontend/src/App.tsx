@@ -4,11 +4,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "@/components/layout/Navigation";
-import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Budgets from "./pages/Budgets";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import DashboardPage from "./pages/dashboard-page";
 
 const queryClient = new QueryClient();
 
@@ -22,11 +22,10 @@ const App = () => (
           <Navigation />
           <main className="container mx-auto px-4 py-8">
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<DashboardPage />} />
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/budgets" element={<Budgets />} />
               <Route path="/settings" element={<Settings />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
