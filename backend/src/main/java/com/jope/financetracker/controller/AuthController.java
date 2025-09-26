@@ -1,10 +1,8 @@
 package com.jope.financetracker.controller;
 
-import com.jope.financetracker.dto.auth.RefreshTokenRequestDTO;
+import com.jope.financetracker.dto.customer.CustomerResponseDTO;
 import com.jope.financetracker.service.AuthService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -40,16 +38,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody AuthRequestDTO obj, HttpServletResponse response) {
+    public ResponseEntity<CustomerResponseDTO> login(@RequestBody AuthRequestDTO obj, HttpServletResponse response) {
         AuthResponseDTO t = service.login(obj);
         ResponseCookie accessCookie = createTokenCookie(ACCESS_TOKEN_COOKIE_NAME, t.accessToken(), accessTokenExpiration);
         ResponseCookie refreshCookie = createTokenCookie(REFRESH_TOKEN_COOKIE_NAME, t.refreshToken(), refreshTokenExpiration);
 
         return ResponseEntity
-                .noContent()
+                .ok()
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .build();
+                .body(t.customer());
     }
 
     @PostMapping("/refresh")

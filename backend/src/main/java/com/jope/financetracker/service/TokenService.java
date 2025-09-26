@@ -80,7 +80,7 @@ public class TokenService {
     }
 
     @Transactional
-    public void revokeAllTokensForUser(UUID userId){
+    public void revokeAllRefreshTokensForUser(UUID userId){
         refreshTokenRepository.deleteAllByCustomerId(userId);
     }
 }

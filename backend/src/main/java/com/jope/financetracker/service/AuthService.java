@@ -2,6 +2,7 @@ package com.jope.financetracker.service;
 
 import com.jope.financetracker.dto.auth.AuthRequestDTO;
 import com.jope.financetracker.dto.auth.AuthResponseDTO;
+import com.jope.financetracker.dto.customer.CustomerMapper;
 import com.jope.financetracker.exceptions.InvalidTokenException;
 import com.jope.financetracker.model.Customer;
 import com.jope.financetracker.model.RefreshToken;
@@ -25,11 +26,14 @@ public class AuthService {
     private final CustomerService customerService;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final CustomerMapper customerMapper;
 
-    public AuthService(TokenService tokenService, CustomerService customerService, PasswordEncoder passwordEncoder) {
+    public AuthService(TokenService tokenService, CustomerService customerService,
+                       PasswordEncoder passwordEncoder, CustomerMapper customerMapper) {
         this.tokenService = tokenService;
         this.customerService = customerService;
         this.passwordEncoder = passwordEncoder;
+        this.customerMapper = customerMapper;
     }
 
     public AuthResponseDTO login(AuthRequestDTO obj){
@@ -41,10 +45,10 @@ public class AuthService {
 
         Customer cos = opt.get();
         String accessToken = tokenService.createToken(cos);
-        tokenService.revokeAllTokensForUser(cos.getId());
+        tokenService.revokeAllRefreshTokensForUser(cos.getId());
         String refreshToken = tokenService.createRefreshToken(cos).getToken();
 
-        return new AuthResponseDTO(accessToken, refreshToken, accessTokenExpiration);
+        return new AuthResponseDTO(accessToken, refreshToken, customerMapper.costumerToCostumerResponseDTO(cos));
     }
 
     public void logout(String refreshToken){
@@ -63,7 +67,7 @@ public class AuthService {
         tokenService.invalidateToken(token);
         String newToken = tokenService.createToken(token.getCustomer());
         String newRefreshToken = tokenService.createRefreshToken(token.getCustomer()).getToken();
-        return new AuthResponseDTO(newToken, newRefreshToken, accessTokenExpiration);
+        return new AuthResponseDTO(newToken, newRefreshToken, null);
     }
 
     private boolean isTokenExpired(RefreshToken token) {

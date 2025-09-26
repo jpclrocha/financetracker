@@ -86,7 +86,7 @@ public class CustomerService {
     public void deleteCostumer(UUID id) {
         currentUserService.checkAccess(id);
         try {
-            tokenService.revokeAllTokensForUser(id);
+            tokenService.revokeAllRefreshTokensForUser(id);
             repository.deleteById(id);
         } catch (DataAccessException ex) {
             throw new DatabaseException("Failed to delete costumer: " + id);
