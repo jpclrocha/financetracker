@@ -17,6 +17,10 @@ import {
 	ArrowUpRight,
 	ArrowDownRight,
 } from "lucide-react";
+import { useSummary } from "./hooks/use-summary";
+import { useEffect } from "react";
+import { useRecentTransactions } from "./hooks/use-recent-transactions";
+import { format } from "date-fns";
 
 // Mock data - replace with actual API calls
 const summaryData = {
@@ -71,7 +75,29 @@ const recentTransactions = [
 	},
 ];
 
+const currentDate = new Date();
+const firstDayOfMonth = new Date(
+	currentDate.getFullYear(),
+	currentDate.getMonth(),
+	1
+);
+
 const Dashboard = () => {
+	const { data, isLoading, isError } = useSummary(firstDayOfMonth, null);
+	const {
+		data: recentTransactions,
+		isLoading: isLoading2,
+		isError: isError2,
+	} = useRecentTransactions();
+
+	if (isLoading || isLoading2) {
+		return <div>Loading...</div>;
+	}
+
+	if (isError || !data || isError2 || !recentTransactions) {
+		return <div>Error loading dashboard data.</div>;
+	}
+
 	return (
 		<div className='space-y-6'>
 			{/* Header */}
@@ -93,27 +119,27 @@ const Dashboard = () => {
 			<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
 				<SummaryCard
 					title='Total Income'
-					value={`$${summaryData.totalIncome.toLocaleString()}`}
+					value={`$${data.totalIncome.toLocaleString()}`}
 					icon={TrendingUp}
 					variant='success'
-					trend={{ value: "12%", isPositive: true }}
+					// trend={{ value: "12%", isPositive: true }}
 				/>
 				<SummaryCard
 					title='Total Expenses'
-					value={`$${summaryData.totalExpenses.toLocaleString()}`}
+					value={`$${data.totalExpenses.toLocaleString()}`}
 					icon={TrendingDown}
 					variant='destructive'
-					trend={{ value: "5%", isPositive: false }}
+					// trend={{ value: "5%", isPositive: false }}
 				/>
 				<SummaryCard
 					title='Net Balance'
-					value={`$${summaryData.netBalance.toLocaleString()}`}
+					value={`$${data.netBalance.toLocaleString()}`}
 					icon={DollarSign}
 					variant='success'
 				/>
 				<SummaryCard
 					title='Transactions'
-					value={summaryData.transactionCount.toString()}
+					value={data.transactions.transactionCount.toString()}
 					icon={Receipt}
 				/>
 			</div>
@@ -159,8 +185,7 @@ const Dashboard = () => {
 													{transaction.description}
 												</p>
 												<p className='text-sm text-muted-foreground'>
-													{transaction.category} •{" "}
-													{transaction.date}
+													{`${transaction.categoryName} • ${transaction.date.toLocaleString()}`} 
 												</p>
 											</div>
 										</div>
@@ -199,12 +224,12 @@ const Dashboard = () => {
 						</CardHeader>
 						<CardContent>
 							<div className='space-y-4'>
-								{budgets.map((budget, index) => (
+								{data.budgets.map((budget, index) => (
 									<BudgetCard
-										key={index}
+										key={budget.name + index}
 										name={budget.name}
-										spent={budget.spent}
-										budget={budget.budget}
+										spent={budget.amountSpent}
+										budget={budget.amount}
 									/>
 								))}
 							</div>

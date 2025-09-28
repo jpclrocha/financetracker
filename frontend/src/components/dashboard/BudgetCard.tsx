@@ -33,7 +33,7 @@ export const BudgetCard = ({
   return (
     <Card className="transition-all hover:shadow-md">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base font-medium">{name}</CardTitle>
+        <CardTitle className="text-base font-medium capitalize">{name}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex justify-between text-sm">
