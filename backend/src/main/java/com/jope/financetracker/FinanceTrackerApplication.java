@@ -22,7 +22,7 @@ public class FinanceTrackerApplication {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH")
+                        .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS")
                         .allowedOrigins("http://localhost:8080")
                         .allowCredentials(true);
             }

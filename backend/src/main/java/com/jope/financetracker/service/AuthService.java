@@ -3,6 +3,7 @@ package com.jope.financetracker.service;
 import com.jope.financetracker.dto.auth.AuthRequestDTO;
 import com.jope.financetracker.dto.auth.AuthResponseDTO;
 import com.jope.financetracker.dto.customer.CustomerMapper;
+import com.jope.financetracker.dto.customer.CustomerResponseDTO;
 import com.jope.financetracker.exceptions.InvalidTokenException;
 import com.jope.financetracker.model.Customer;
 import com.jope.financetracker.model.RefreshToken;
@@ -27,13 +28,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final CustomerMapper customerMapper;
+    private final CurrentUserService currentUserService;
 
     public AuthService(TokenService tokenService, CustomerService customerService,
-                       PasswordEncoder passwordEncoder, CustomerMapper customerMapper) {
+                       PasswordEncoder passwordEncoder, CustomerMapper customerMapper,
+                       CurrentUserService currentUserService) {
         this.tokenService = tokenService;
         this.customerService = customerService;
         this.passwordEncoder = passwordEncoder;
         this.customerMapper = customerMapper;
+        this.currentUserService = currentUserService;
     }
 
     public AuthResponseDTO login(AuthRequestDTO obj){
@@ -53,6 +57,10 @@ public class AuthService {
 
     public void logout(String refreshToken){
         tokenService.invalidateToken(refreshToken);
+    }
+
+    public CustomerResponseDTO getCustomerProfile(){
+        return customerMapper.costumerToCostumerResponseDTO(customerService.findById(currentUserService.getCurrentUserId()));
     }
 
     public AuthResponseDTO renewToken(String refreshToken){

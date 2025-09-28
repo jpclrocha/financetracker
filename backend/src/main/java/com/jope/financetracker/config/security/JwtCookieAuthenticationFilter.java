@@ -53,11 +53,18 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
+            filterChain.doFilter(request, response);
+
         } catch (JwtException e) {
             SecurityContextHolder.clearContext();
-            logger.debug("Invalid JWT received from cookie: " + e.getMessage());
-        }
 
-        filterChain.doFilter(request, response);
+            if (e.getMessage().toLowerCase().contains("expired")) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT expired");
+            } else {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid JWT");
+            }
+            return;
+        }
     }
+
 }

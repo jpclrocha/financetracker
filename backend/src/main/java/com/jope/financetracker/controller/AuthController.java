@@ -38,16 +38,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CustomerResponseDTO> login(@RequestBody AuthRequestDTO obj, HttpServletResponse response) {
+    public ResponseEntity<Void> login(@RequestBody AuthRequestDTO obj, HttpServletResponse response) {
         AuthResponseDTO t = service.login(obj);
         ResponseCookie accessCookie = createTokenCookie(ACCESS_TOKEN_COOKIE_NAME, t.accessToken(), accessTokenExpiration);
         ResponseCookie refreshCookie = createTokenCookie(REFRESH_TOKEN_COOKIE_NAME, t.refreshToken(), refreshTokenExpiration);
 
         return ResponseEntity
-                .ok()
+                .noContent()
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(t.customer());
+                .build();
     }
 
     @PostMapping("/refresh")
@@ -61,6 +61,14 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, newAccessToken.toString())
                 .header(HttpHeaders.SET_COOKIE, newRefreshToken.toString())
                 .build();
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<CustomerResponseDTO> renewTokens() {
+        CustomerResponseDTO c = service.getCustomerProfile();
+        return ResponseEntity
+                .ok()
+                .body(c);
     }
 
     @PostMapping("/logout")

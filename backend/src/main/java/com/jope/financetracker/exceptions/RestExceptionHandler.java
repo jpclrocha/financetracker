@@ -57,7 +57,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         @ExceptionHandler(AccessDeniedException.class)
         protected ResponseEntity<ApiErrorDTO> handleAccessDeniedException(AccessDeniedException e,
                         WebRequest request) {
-                HttpStatus status = HttpStatus.NOT_FOUND;
+                HttpStatus status = HttpStatus.FORBIDDEN;
                 String path = ((ServletWebRequest) request).getRequest().getRequestURI();
                 ApiErrorDTO error = new ApiErrorDTO(
                                 status,
@@ -70,14 +70,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         @ExceptionHandler(ResponseStatusException.class)
         protected ResponseEntity<ApiErrorDTO> handleResponseStatusException(ResponseStatusException e,
                         WebRequest request) {
-                HttpStatus status = HttpStatus.NOT_FOUND;
                 String path = ((ServletWebRequest) request).getRequest().getRequestURI();
                 ApiErrorDTO error = new ApiErrorDTO(
-                                status,
+                        e.getStatusCode().value(),
                                 e.getMessage(),
                                 path,
                                 Instant.now());
-                return new ResponseEntity<>(error, status);
+                return new ResponseEntity<>(error, e.getStatusCode());
         }
 
         @ExceptionHandler(IllegalArgumentException.class)

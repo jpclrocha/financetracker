@@ -54,13 +54,13 @@ public class DashboardService {
         BigDecimal totalExpenses = summary.getTotalExpenses();
         BigDecimal netBalance = summary.getNetBalance();
         Long transactionCount = summary.getTransactionCount();
-        Long incomeTransactionCount = summary.getIncomeCount();
-        Long expenseTransactionCount = summary.getExpenseCount();
+        Long incomeTransactionCount = summary.getIncomeCount() != null ? summary.getIncomeCount() : 0L;
+        Long expenseTransactionCount = summary.getExpenseCount() != null ? summary.getExpenseCount() : 0L;
 
         List<Budget> budgets = budgetService.getAllBudgets();
 
         Map<Category, BigDecimal> spendingPerCategory = transactions.stream()
-                .filter(tx -> tx.getCategory().getType() == ExpenseType.EXPENSE)
+                .filter(tx -> tx.getCategory() != null && tx.getCategory().getType() == ExpenseType.EXPENSE)
                 .collect(Collectors.groupingBy(Transaction::getCategory,
                         Collectors.reducing(BigDecimal.ZERO, Transaction::getAmount, BigDecimal::add)));
 
